@@ -1,0 +1,162 @@
+
+{% extends './particular.html' %}
+
+
+{% block content %}
+    <!-- 任务发布 -->
+<div class="task">
+                <div class="tem-box">
+                    <div class="store">任务发布</div>
+                </div>
+                <div class="input">
+                    <div id="task_input">
+                        <div class="form-group">
+                            <select name="" class="type">
+                                <option value="" selected disabled style="display:none">任务类型</option>
+                                <option value="搜索">搜索</option>
+                                <option value="数据供应">数据供应</option>
+                                <option value="软件供应">软件供应</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" placeholder="提交数据源url" class="data">
+                        </div>
+                        <div class="form-group">
+                            <div class="time_cont">
+                                <input type="text" placeholder="任务截止期限" class="deadline" id="dead_line">
+                                <img src="../static/images/时间.svg" alt="">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" placeholder="报价" class="offer">
+                        </div>
+                    </div>
+                    <input type="submit" value="提交" class="commit" id="task_submit">
+
+
+                    <!--提交成功支付 ajax 进行加载-->
+
+
+                    <!--支付成功-->
+                    <div class="task_pay_ok comment" style="display: none">
+                        <img class="isSuccess" src="../static/images/succeed.svg" alt="">
+                        <p>任务已发布</p>
+                        <p>请等待接单 <span>我的任务></span></p>
+                    </div>
+
+
+                    <!--匹配失败-->
+                    <div class="task_field comment" style="display: none">
+                        <img class="isSuccess" src="../static/images/defeat.svg" alt="">
+                        <p>任务不可行</p>
+                        <p>请核对并修改信息后，再重新提交。</p>
+                        <button class="task_back">请返回修改</button>
+                    </div>
+                    <!---->
+                </div>
+            </div>
+
+
+    <script>
+        //    任务发表
+        $(function () {
+            $(".task").siblings().css("display", "none");
+            $(".task").css("display", "block");
+            $('#task img:eq(0)').css("display", "none");
+            $('#task img:eq(1)').css("display", "block");
+            $('#task div').css("color", "#427CFF");
+            $('#task').siblings().children("img").hide();
+            $('#task').siblings().children(".now").show();
+            $('#task').siblings().children().css("color", "#000");
+        });
+
+
+
+        $(function () {
+            $("#task_submit").click(function () {
+                var _this = this;
+                var task_type = $(".type").val();
+                var data = $(".data").val();
+                var deadline = $(".deadline").val();
+                var offer = $(".offer").val();
+                var token = "Bearer " + localStorage.token;
+                console.log(token);
+
+
+                $.ajax({
+                    url: "/task/",
+                    type: "post",
+                    data: JSON.stringify({
+                        "category": task_type,
+                        "url": data,
+                        "status": 0,
+                        "deadline": deadline,
+                        "price": offer,
+                    }),
+                    contentType: "application/json",
+                    dataType: "json",
+                    headers: {
+                        Authorization: token,
+                    },
+                    async: false,
+                    cache: false,
+                    success: function (result) {
+                        console.log(result);
+                        console.log("++++++++++++++++++++++++++++++++++++++++++++++++");
+                        $(_this).hide();
+                        $("#task_input").css("display", "none");
+                        var ele = "<div class=\"task_mate comment\" style=\"display: block\">\n" +
+                            "<img class=\"isSuccess\" src=\"../static/images/succeed.svg\" alt=\"\">\n" +
+                            "<p>任务已匹配成功</p>\n" +
+                            "<p>节点数:" + result.useful_node_nums + "个，预计完成时间:" + result.planned_complete_time + "</p>\n" +
+                            "<p>支付佣金 : <span>" + result.price + "元</span></p>\n" +
+                            "<div class=\"task_pay\">\n" +
+                            "<input type=\"hidden\"  id=\"order_id\" value=\"" + result.order_id + "\">" +
+                            "<div>\n" +
+                            "<div class=\"pay_ma_bord\">\n" +
+                            "<img class=\"pay_ma\" src=\"" + result.wxpay_qrcode + "\" alt=\"\">\n" +
+                            "</div>\n" +
+                            "<div class=\"pay_class\"><img src=\"../static/images/微信.svg\" alt=\"\"> <span>微信支付</span>\n" +
+                            "</div>\n" +
+                            "</div>\n" +
+                            "<div>\n" +
+                            "<div class=\"pay_ma_bord\">\n" +
+                            "<img class=\"pay_ma\" src=\"../static/images/ma.png\" alt=\"\">\n" +
+                            "</div>\n" +
+                            "<div class=\"pay_class\"><img src=\"../static/images/支付宝.svg\" alt=\"\"> <span>支付宝</span>\n" +
+                            "</div>\n" +
+                            "</div>\n" +
+                            "</div>\n" +
+                            "</div>\n";
+                        $(ele).insertAfter($("#task_submit"));
+
+                        timer = setInterval(function () {
+                            pay_status(token, result.order_id)
+                        }, 3000)
+
+                    },
+                    error: function (result) {
+                        console.log(result);
+                        $(_this).hide();
+                        $("#task_input").css("display", "none");
+                        $(".task_field").css("display", "block");
+                    }
+                })
+
+            })
+        });
+
+        // 任务发布失败返回修改标签
+        $(".task_back").click(function () {
+            $("#task_submit").show();
+            $("#task_input").show();
+            $(".task_field").hide();
+        });
+
+
+
+    </script>
+{% endblock %}
+
+
+

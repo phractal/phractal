@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../static/css/particular.css">
+    <link rel="stylesheet" href="../static/lib/bootstrap/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+    <script src="http://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js"></script>
+    <script src="../static/js/laydate/laydate.js"></script>
+    <script src="../static/lib/bootstrap/js/bootstrap.min.js"></script>
+
+{#    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">#}
+<style>
+    .head_input{
+        position: relative;
+    }
+    .btn{
+        position: absolute;
+        left:365px;
+        top:3px;
+        background-color: #5a5a5a;
+    }
+</style>
+<body>
+<div class="content">
+    <div class="head">
+        <div class="head-cont">
+            <div class="head-left">
+                <img src="/static/images/logo—icon.png" alt="" class="head_img">
+                <div class="head_input">
+                     <img src="/static/images/serch.png" alt="">
+                    <input id="search" type="text">
+                    <button class="btn" type="button" onclick="search()">
+                                    搜索
+                                </button>
+                </div>
+            </div>
+            <div class="head-right">
+{#                <div class="help">帮助</div>#}
+{#                <div class="phone">#}
+{#                    <img src="../static/images/手机.svg" alt="">#}
+{#                    <p>手机APP</p>#}
+{#                </div>#}
+
+                <div class="nickname">
+                    <img src="" alt="">
+                    <p></p>
+                </div>
+                <div class="logout">退出</div>
+            </div>
+        </div>
+    </div>
+<div class="box_boxes">
+    <div class="boxes">
+        <div class="left_side">
+            <div class="side-name">管理中心</div>
+            <ul class="sidebar">
+{#                <li class="mainMenu" id="task" onclick="window.parent.location.href='/taskpub'">#}
+{#                    <img class="now" src="../static/images/任务发布.svg" alt="">#}
+{#                    <img src="../static/images/任务发布选中.svg" alt="">#}
+{#                    <div class="mainMenu_cilk">任务发布</div>#}
+{#                </li>#}
+{#                <li class="mainMenu" id="task_list" onclick="window.parent.location.href='/tasklist'">#}
+{#                    <img class="now" src="../static/images/任务列表.svg" alt="">#}
+{#                    <img src="../static/images/任务列表选中.svg" alt="">#}
+{#                    <div class="mainMenu_cilk">任务列表</div>#}
+{#                </li>#}
+{#                <li class="mainMenu" id="order" onclick="window.parent.location.href='/myorder'">#}
+{#                    <img class="now" src="../static/images/我的接单.svg" alt="">#}
+{#                    <img src="../static/images/我的接单选中.svg" alt="">#}
+{#                    <div class="mainMenu_cilk">我的接单</div>#}
+{#                </li>#}
+
+                <li class="mainMenu"  id="searchHistory" onclick="window.parent.location.href='/search_history?token='+localStorage.token">
+                    <img class="now" src="../static/images/seach.png" alt="">
+                    <img src="../static/images/seek.png" alt="">
+                    <div class="mainMenu_cilk">搜索历史</div>
+                </li>
+                <li class="mainMenu" id="node" onclick="window.parent.location.href='/mynode'">
+                    <img class="now" src="../static/images/节点管理.svg" alt="">
+                    <img src="../static/images/node.png" alt="">
+                    <div class="mainMenu_cilk">节点管理</div>
+                </li>
+
+                <li class="mainMenu" id="download" onclick="window.parent.location.href='/download_node'">
+                    <img class="now" src="../static/images/download.png" alt="">
+                    <img src="../static/images/seek_icon.png" alt="">
+                    <div class="mainMenu_cilk">节点下载</div>
+                </li>
+
+                <li class="mainMenu" id="statistic" onclick="window.parent.location.href='/statistics'">
+                    <img class="now" src="../static/images/statistics.png" alt="">
+                    <img src="../static/images/statistics_icon.png" alt="">
+                    <div class="mainMenu_cilk">统计查询</div>
+                </li>
+
+                <li class="mainMenu" id="blockchain" onclick="window.parent.location.href='/blockchain'">
+                    <img class="now" src="../static/images/blockchain.png" alt="">
+                    <img src="../static/images/blockchain_icon.png" alt="">
+                    <div class="mainMenu_cilk">区块浏览</div>
+                </li>
+
+{#                <li class="mainMenu" id="" onclick="window.parent.location.href='#'">#}
+{#                    <img class="now" src="../static/images/我的余额.svg" alt="">#}
+{#                    <img src="../static/images/我的余额选中.svg" alt="">#}
+{#                    <div class="mainMenu_cilk">我的余额</div>#}
+{#                </li>#}
+
+
+                <li class="mainMenu" id="personal"  onclick="window.parent.location.href='/personaldata'">
+                    <img class="now" src="../static/images/个人资料.svg">
+                    <img src="../static/images/个人资料选中.svg" alt="">
+                    <div class="mainMenu_cilk">个人资料</div>
+                </li>
+                <li class="mainMenu" id="alter-password" onclick="window.parent.location.href='/changepasswd'">
+                    <img class="now" src="../static/images/修改密码.svg" alt="">
+                    <img src="../static/images/修改密码选中.svg" alt="">
+                    <div class="mainMenu_cilk">修改密码</div>
+                </li>
+
+{#                <li class="mainMenu" id="" onclick="window.parent.location.href='#'">#}
+{#                    <img class="now" src="../static/images/系统资源.svg" alt="">#}
+{#                    <img src="../static/images/系统资源选中.svg" alt="">#}
+{#                    <div class="mainMenu_cilk">系统资源</div>#}
+{#                </li>#}
+
+            </ul>
+        </div>
+        <div class="right_content col-sm-10">
+            {% block  content %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="mask" style="display: none"></div>
+<div class="coverage coverMy" style="display: none">
+    <div class="tem-box">
+        <div class="store">明细</div>
+    </div>
+    <div class="node_table">
+        <table id="my_task_detail">
+        </table>
+
+
+    </div>
+</div>
+<div class="coverage coverList" style="display: none">
+    <div class="tem-box">
+        <div class="store">节点列表</div>
+    </div>
+    <div class="node_table">
+        <table id="node_detail">
+        </table>
+
+
+    </div>
+</div>
+</body>
+
+
+<script type="text/javascript">
+    let winHeight = window.screen.availHeight
+    let headHeight = document.querySelector('.head').clientHeight
+    let boxeslHeight = document.querySelector('.box_boxes')
+    boxeslHeight.style.height= (winHeight -headHeight ) + "px"
+    console.log(boxeslHeight.style.height)
+    // 设置选择框颜色
+    let unselected = "#E5E5E5";
+    let selected = "#333";
+    $(function () {
+        let choice = $("select");
+        choice.css("color", unselected);
+        $("option").css("color", selected);
+        choice.change(function () {
+            let selItem = $(this).val();
+            if (selItem === $(this).find('option:first').val()) {
+                $(this).css("color", unselected);
+            } else {
+                $(this).css("color", selected);
+            }
+        });
+    });
+
+
+
+        //蒙层
+        $(".mask").click(function () {
+            $(this).hide();
+            $(".coverage").hide();
+        });
+
+
+
+
+        $(function () {
+            $(".order .tab-item").click(function () {
+                $(this).addClass("active").siblings().removeClass("active");
+                $(".order .main").eq($(this).index()).show().siblings().hide();
+            })
+        });
+
+
+        // 我的钱包
+
+
+        // 提现功能
+
+
+        // ****************************************************
+        $(".type").change(function () {
+            if ($(".type").val() == "always") {
+                $('.always').css("display", "block");
+                $('.annex').css("display", "none");
+            }
+            if ($(".type").val() == "annex") {
+                $('.annex').css("display", "block");
+                $('.always').css("display", "none");
+            }
+        });
+
+
+        // *****************************************************
+        $(".lump .span1 input.radio").on("change", function () {
+            if ($(this).val()) {
+                $(this).next().attr({src: "../static/images/check-circle.svg"});
+                $(this).parent().siblings().find("img").attr({src: "../static/images/check-circle-o.svg"})
+            } else {
+                $(this).next().attr({src: "../static/images/check-circle-o.svg"});
+                $(this).parent().siblings().find("img").attr({src: "../static/images/check-circle.svg"})
+            }
+        });
+
+
+        // 提现
+        $(function () {
+            $("#withdraw").click(function () {
+                var that = this;
+                var token = "Bearer " + localStorage.token;
+
+                $.ajax({
+                    url: "/myaccount/",
+                    contentType: "application/json",
+                    headers: {
+                        Authorization: token,
+                    },
+                    async: false,
+                    cache: false,
+                    success: function (result) {
+                        console.log(result)
+                        let balance = parseFloat(result[0].balance);
+
+                        if (balance >= 100) {
+                            $.ajax({
+                                url: "/withdraw/",
+                                type: "POST",
+                                contentType: "application/json",
+                                headers: {
+                                    Authorization: token,
+                                },
+                                data: JSON.stringify({"amount": 100}),
+                                async: false,
+                                cache: false,
+                                success: function (res) {
+                                    let result = res.data;
+                                    if (result === "unbound") {
+                                        alert("您还未绑定微信账户，无法转账!")
+                                    } else if (result === "success") {
+                                        let balance_ = balance - 100;
+                                        $(that).prev().html(balance_);
+                                        alert("提现成功！")
+                                    } else {
+                                        alert("提现失败，请稍后重试!")
+                                    }
+                                }
+                            })
+                        } else {
+                            alert("对不起，当账户余额大于100时，才能提现！")
+                        }
+
+                    }
+                });
+
+            })
+        });
+
+
+        $("#bound").click(
+            function () {
+                let user_id = localStorage.user_id;
+                let token = "Bearer " + localStorage.token;
+                let bound_value = $(this).html();
+                let that = this;
+                if (bound_value === "未绑定?点击") {
+                    $(this).html("取消")
+                } else {
+                    $(this).html("未绑定?点击")
+                }
+                $.ajax({
+                    url: "/bound/",
+                    type: "POST",
+                    headers: {
+                        Authorization: token,
+                    },
+                    data: JSON.stringify({"user_id": user_id}),
+                    contentType: "application/json",
+                    async: false,
+                    cache: false,
+                    success: function (result) {
+                        let data = result.data;
+                        console.log(data);
+                        if (data) {
+                            if ($("#bound_container").is(":visible")) {
+                                $("#bound_container").hide();
+                                alert("微信绑定成功！")
+                            } else {
+                                $("#bound_container").hide();
+                                alert("你已经绑定过微信账户！");
+                                $(that).html("未绑定?点击")
+                             }
+                        } else {
+
+                            var content = "iframe{width: 150; height: 150;} .impowerBox .qrcode {width: 100px;}.impowerBox .title {display: none;}.impowerBox .info {width: 200px; display: none;} body {font-size: 10px; color:red}";
+                            var blob = new Blob([content], {type: "text/css;charset=utf-8"});
+                            var reader = new FileReader();
+                            reader.readAsDataURL(blob);
+                            reader.onload = function (e) {
+                                var obj = new WxLogin({
+                                    self_redirect: true,
+                                    id: "bound_container",
+                                    appid: "wxbb19e286afae10db",
+                                    scope: "snsapi_login",
+                                    response_type: "code",
+                                    redirect_uri: "http://192.168.3.84:8000/bound",
+                                    state: user_id,
+                                    style: "",
+                                    href: this.result
+                                });
+
+                            };
+
+                            if (bound_value === "取消") {
+                                $("#bound_container").hide();
+                            } else {
+                                $("#bound_container").show();
+                                alert("请微信扫码绑定，谢谢")
+                            }
+
+                        }
+                    }
+                });
+
+
+    });
+    $(function () {
+        $(".task_list .tab-item").click(function () {
+            $(this).addClass("active").siblings().removeClass("active");
+            $(".task_list .main").eq($(this).index()).show().siblings().hide();
+        })
+    });
+    // 加载用户头像,以及用户信息
+    $(function () {
+
+        console.log(window.location.href)
+        console.log(window.location.search.indexOf("nickname"))
+        console.log(encodeURI(window.location.href))
+        if(window.location.search.indexOf("nickname") != -1){
+
+            let href = window.location.search.split("&")
+            let username = href[0].split("=")[1];
+            username=decodeURI(username)
+            let img = href[1].split("=")[1];
+            console.log(username,"9999999999999")
+
+            {#let username = "asdfajsd"#}
+            let password = 'woshimima'
+             $.ajax({
+                type: "POST",
+                url: "/register/simple/",
+                data: JSON.stringify({"username": username, "password": password, "headimgurl":img, "avatar": img}),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (result) {
+                     $.ajax({
+                        type: "POST",
+                        url: "/api-token-auth/",
+                        data: JSON.stringify({"username": username, "password": password}),
+                        contentType: "application/json",
+                        success: function (token) {
+                            console.log(token);
+
+                            localStorage.token = token.access;
+                            $(".head-right .nickname p").html(username);
+                            $(".head-right .nickname img").attr("src", img)
+                            {#window.location.href = "/particular"#}
+                        },
+                        error: function () {
+                            alert("登录名或者密码错误，请重新输入");
+                            return false
+                        }
+                    })
+                },
+                error: function (result) {
+                    if (result.status === 400) {
+                        $.ajax({
+                        type: "POST",
+                        url: "/api-token-auth/",
+                        data: JSON.stringify({"username": username, "password": password}),
+                        contentType: "application/json",
+                        success: function (token) {
+                            console.log(token);
+
+                            localStorage.token = token.access;
+                            $(".head-right .nickname p").html(username);
+                            $(".head-right .nickname img").attr("src", img)
+                            {#window.location.href = "/particular"#}
+                        },
+                        error: function () {
+                            alert("登录名或者密码错误，请重新输入");
+                            return false
+                        }
+                    })
+                        {#alert("该邮箱或用户名已经被注册，请重新填写！")#}
+                    }
+                    if (result.status === 403) {
+                        alert("未知错误！")
+                    }
+                    {#window.location.href = "/register"#}
+                }
+
+            })
+        }else {
+            console.log("2222222222222222")
+            var token = "Bearer " + localStorage.token;
+             // 请求用户个人信息
+            $.ajax({
+                url: "/userprofile/",
+                contentType: "application/json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (profile) {
+                    let user_id = profile.id;
+                    localStorage.user_id = user_id;
+                    if (profile.avatar_url.search("default.jpg") !== -1) {
+                        $(".head-right .nickname p").html(profile.username);
+                        $(".head-right .nickname img").attr("src", "../media/" + profile.avatar_url)
+
+                    } else {
+                        $(".head-right .nickname p").html(profile.username);
+                        $(".head-right .nickname img").attr("src", profile.avatar_url)
+                    }
+
+                    // 发送用户信息，获取节点信息，绑定节点到用户
+                    $.ajax({
+                        url: "",
+                        type: "POST",
+                        data: JSON.stringify({"user_id": user_id}),
+                        contentType: "application/json",
+                        async: false,
+                        cache: false,
+                        success: function (node_info) {
+                            $.post("/node", {node: node_info}, function (data) {
+                                console.log("节点创建成功！！！！！！！！！！！")
+                            }, "json")
+                        }
+
+                    })
+
+                },
+                error: function () {
+                    window.location.href = "/login"
+                }
+            })
+        }
+
+
+    });
+
+
+    // 用户退出
+    $(function () {
+        $(".logout").click(function () {
+            localStorage.clear();
+            window.location.href = "/index"
+        })
+    });
+
+
+    // 时间格式转换
+    function formateDate(datetime) {
+        function addDateZero(num) {
+            return (num < 10 ? "0" + num : num);
+        }
+
+        let d = new Date(datetime);
+        return d.getFullYear() + '-' + addDateZero(d.getMonth() + 1) + '-' + addDateZero(d.getDate()) + ' ' + addDateZero(d.getHours()) + ':' + addDateZero(d.getMinutes()) + ':' + addDateZero(d.getSeconds());
+    }
+
+    // 获取支付状态，并完成跳转
+    function pay_status(token, order_id) {
+        $.ajax({
+            url: "/payment/" + order_id + "/",
+            type: "GET",
+            headers: {
+                Authorization: token,
+            },
+            success: function (data) {
+                console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                if (data.already_pay === "支付成功") {
+                    clearInterval(timer);
+                    alert("支付成功");
+                    window.location.reload();
+                }
+            }
+        })
+
+    }
+
+
+    //时间选择器, 执行一个laydate实例
+    laydate.render({
+        elem: '#dead_line',
+        type: 'datetime'
+    });
+
+    // 用户出生年月
+    laydate.render({
+        elem: '#birthday',
+        type: 'date'
+    });
+
+
+   function search() {
+        var input_data = document.getElementById("search").value;
+        window.location.href = '/search_result/?key='+encodeURI(input_data)+'&token='+localStorage.token
+    }
+
+
+
+</script>
+
+</html>

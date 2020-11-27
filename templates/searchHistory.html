@@ -1,0 +1,39 @@
+{% extends './particular.html' %}
+
+
+{% block content %}
+  <div class="searchHistory" >
+                <div class="tem-box">
+                    <div class="store">搜索历史</div>
+                </div>
+      <div class="hostory">
+            {% for history in history_list %}
+                <span onclick="search_result('{{history}}')">{{ history }}</span>
+            {% endfor %}
+
+
+
+      </div>
+  </div>
+    <script>
+    var has_result = '{{ has_result|safe }}';
+    console.log(has_result,'has result!!!!!!!');
+    if(has_result=='False'){
+        alert('正在搜索')
+    }
+        $(function () {
+               $(".searchHistory").siblings().css("display", "none");
+                $(".searchHistory").css("display", "block");
+                $('#searchHistory img:eq(0)').css("display", "none");
+                $('#searchHistory img:eq(1)').css("display", "block");
+                $('#searchHistory div').css("color", "#427CFF");
+                $('#searchHistory').siblings().children("img").hide();
+                $('#searchHistory').siblings().children(".now").show();
+                $('#searchHistory').siblings().children().css("color", "#fafafa");
+
+        })
+    function search_result(searchkey) {
+        window.location.href = '/search_result/?key='+searchkey+'&token='+localStorage.token
+    }
+    </script>
+{% endblock %}

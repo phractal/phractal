@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../static/css/particular.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js"></script>
+    <script src="../static/js/laydate/laydate.js"></script>
+{#    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">#}
+<body>
+<div class="content">
+    <div class="head">
+        <div class="head-cont">
+            <div class="head-left">复联数据实时看板</div>
+            <div class="head-right">
+                <div class="help">帮助</div>
+                <div class="phone">
+                    <img src="../static/images/手机.svg" alt="">
+                    <p>手机APP</p>
+                </div>
+
+                <div class="nickname">
+                    <p></p>
+                    <img src="" alt="">
+                </div>
+                <div class="logout">退出</div>
+            </div>
+        </div>
+    </div>
+    <div class="boxes">
+        <div class="left_side">
+            <div class="side-name">管理中心</div>
+            <ul class="sidebar">
+                <li class="mainMenu" id="task">
+                    <img class="now" src="../static/images/任务发布.svg" alt="">
+                    <img src="../static/images/任务发布选中.svg" alt="">
+                    <div class="mainMenu_cilk">任务发布</div>
+                </li>
+                <li class="mainMenu" id="task_list">
+                    <img class="now" src="../static/images/任务列表.svg" alt="">
+                    <img src="../static/images/任务列表选中.svg" alt="">
+                    <div class="mainMenu_cilk">任务列表</div>
+                </li>
+                <li class="mainMenu" id="order">
+                    <img class="now" src="../static/images/我的接单.svg" alt="">
+                    <img src="../static/images/我的接单选中.svg" alt="">
+                    <div class="mainMenu_cilk">我的接单</div>
+                </li>
+                <li class="mainMenu" id="personal">
+                    <img class="now" src="../static/images/个人资料.svg" alt="">
+                    <img src="../static/images/个人资料选中.svg" alt="">
+                    <div class="mainMenu_cilk">个人资料</div>
+                </li>
+                <li class="mainMenu" id="node">
+                    <img class="now" src="../static/images/我的节点.svg" alt="">
+                    <img src="../static/images/我的节点选中.svg" alt="">
+                    <div class="mainMenu_cilk">我的节点</div>
+                </li>
+                <li class="mainMenu" id="alter-password">
+                    <img class="now" src="../static/images/修改密码.svg" alt="">
+                    <img src="../static/images/修改密码选中.svg" alt="">
+                    <div class="mainMenu_cilk">修改密码</div>
+                </li>
+
+                <li class="mainMenu" id="wallet">
+                    <img class="now" src="../static/images/钱包.svg" alt="">
+                    <img src="../static/images/钱包选中.svg" alt="">
+                    <div class="mainMenu_cilk">我的钱包</div>
+                </li>
+                {# <li class="mainMenu" id="allOrder">#}
+                {#                    <img class="now" src="../static/images/钱包.svg" alt="">#}
+                {#                    <img src="../static/images/钱包选中.svg" alt="">#}
+                {#                    <div class="mainMenu_cilk">我的钱包</div>#}
+                {#                </li>#}
+
+            </ul>
+        </div>
+        <div class="right_content">
+            <!-- 任务发布 -->
+            <div class="task">
+                <div class="tem-box">
+                    <div class="store">任务发布</div>
+                </div>
+                <div class="input">
+                    <div id="task_input">
+                        <select name="" class="type">
+                            <option value="任务类型">任务类型</option>
+                            <option value="百度搜索">百度搜索</option>
+                            <option value="google搜索">google搜索</option>
+                        </select><br>
+                        <input type="text" placeholder="提交数据源url" class="data"><br>
+                        <div class="time_cont">
+                            <input type="text" placeholder="任务截止期限" class="deadline" id="dead_line">
+                            <img src="../static/images/时间.svg" alt="">
+                        </div>
+                        <input type="text" placeholder="报价" class="offer"><br>
+                    </div>
+                    <input type="submit" value="提交" class="commit" id="task_submit">
+
+
+                    <!--提交成功支付 ajax 进行加载-->
+
+
+                    <!--支付成功-->
+                    <div class="task_pay_ok comment" style="display: none">
+                        <img class="isSuccess" src="../static/images/succeed.svg" alt="">
+                        <p>任务已发布</p>
+                        <p>请等待接单 <span>我的任务></span></p>
+                    </div>
+
+
+                    <!--匹配失败-->
+                    <div class="task_field comment" style="display: none">
+                        <img class="isSuccess" src="../static/images/defeat.svg" alt="">
+                        <p>任务不可行</p>
+                        <p>请核对并修改信息后，再重新提交。</p>
+                        <button class="task_back">请返回修改</button>
+                    </div>
+                    <!---->
+                </div>
+            </div>
+
+            <!--我的节点-->
+            <div class="node" style="display: none">
+                <div class="tem-box">
+                    <div class="store">我的节点</div>
+                </div>
+                <div class="content_a">
+                    <div class="demo-nav">
+                        <ul class="menu fllil">
+                            <li>批量操作
+                                <ul class="sub-menu">
+                                    <li>打开勾选节点</li>
+                                    <li>关闭勾选节点</li>
+                                    <li>menu</li>
+                                    <li>nav</li>
+                                </ul>
+                            </li>
+                            <li onclick="openAll()">开启节点</li>
+                            <li onclick="closeAll()">关闭节点</li>
+                            <li onclick="newNode()">新建节点</li>
+                        </ul>
+                    </div>
+                    <table id="flower" class="cont_aa">
+                        <tr>
+                            <th><input onchange="allChose()" type="checkbox" name="" id="checks"></th>
+                            <th>名称/ID</th>
+                            <th>类型</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                        <tr class="ontd">
+                            <td><input name="checks" data-id="1" type="checkbox"></td>
+                            <td>XXXX-node</td>
+                            <td>baidu-search</td>
+                            <td>开启</td>
+                            <td>
+                                <span onclick="Add()">拷贝</span>
+                                <span onclick="Delete(event)" data-id="1" class="del">删除</span>
+                                <span onclick="open(evnet)" data-id="1">开启</span>
+                                <span onclick="open(evnet)" data-id="1">关闭</span>
+                            </td>
+                        </tr>
+                        <tr class="ontd">
+                            <td><input name="checks" data-id="2" type="checkbox"></td>
+                            <td>XXXX-node</td>
+                            <td>baidu-search</td>
+                            <td>开启</td>
+                            <td>
+                                <span onclick="Add()">拷贝</span>
+                                <span onclick="Delete(event)" data-id="2" class="del">删除</span>
+                                <span onclick="open(evnet)" data-id="2">开启</span>
+                                <span onclick="open(evnet)" data-id="2">关闭</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="newNode">
+                        <label for="">节点</label>
+                        <select name="fuck" id="">
+                            <option value="123">xxxx</option>
+                            <option value="456">xxxx</option>
+                            <option value="789">xxxx</option>
+                        </select><br>
+                        <label for="">数量</label>
+                        <input type="text" id="inp"><br>
+                        <button onclick="confirm()">确定</button>
+                        <button onclick="newNode()">取消</button>
+                    </div>
+                    <table class="table">
+                        <tr>
+                            <th class="col-md-2">节点类型</th>
+                            <th class="col-md-2">节点总数量</th>
+                            <th class="col-md-2">在运行数量</th>
+                            <th>操作</th>
+                        </tr>
+                        <tr>
+                            <td>类型1</td>
+                            <td>10</td>
+                            <td>2</td>
+                            <td>
+                                <button class="btn btn-default">打开</button>
+                                <button class="btn btn-default">关闭</button>
+                            </td>
+                        </tr>
+
+                    </table>
+
+
+
+
+
+                </div>
+            </div>
+
+            <!-- 任务列表 -->
+            <div class="task_list" style="display: none">
+                <div class="task-cont tab_cont">
+                    <ul class="tab">
+                        <li class="tab-item active">全部</li>
+                        <li class="tab-item">进行中</li>
+                        <li class="tab-item">匹配中</li>
+                        <li class="tab-item">已完成</li>
+                    </ul>
+                    <input type="text" placeholder="请输入">
+                </div>
+                <div class="products">
+                    <div class="main selected" id="main_cont_list">
+
+                    </div>
+                    <div class="main">
+
+                    </div>
+                    <div class="main">
+
+                    </div>
+                    <div class="main">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 我的接单 -->
+            <div class="order" style="display: none">
+                <div class="order-cont tab_cont">
+                    <ul class="tab">
+                        <li class="tab-item active">全部</li>
+                        <li class="tab-item">进行中</li>
+                        <li class="tab-item">已完成</li>
+                    </ul>
+                    <input type="text" placeholder="请输入">
+                </div>
+                <div class="products">
+                    <div class="main selected" id="my_task">
+
+
+                    </div>
+                    <div class="main">
+                    </div>
+                    <div class="main">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 个人资料 -->
+            <div class="personal" style="display: none">
+                <div class="tem-box">
+                    <div class="store">个人资料</div>
+                </div>
+                <div class="personal-cont">
+                    <div class="left">
+                        <p>基本资料</p>
+                        <input type="text" placeholder="用户名" class="name"><br>
+                        <select name="" class="sex">
+                            <option value="请选择">请选择</option>
+                            <option value="male">男</option>
+                            <option value="female">女</option>
+                        </select><br>
+                        <input type="text" placeholder="生日" class="birthday" id="birthday"><br>
+                        <input type="text" placeholder="地址" class="region"><br>
+                        <input type="file" name="pic" id="pic" accept="image/*"/><br>
+                        <div class="button">
+                            <input type="submit" value="取 消" class="cancel" id="profile_cancel">
+                            <input type="submit" value="提 交" class="refer" id="profile_submit">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <p>修改头像</p>
+                        <div class="upload-head">
+                            <div class="upload-box">
+                                <div class="upload">
+                                    <div class="across"></div>
+                                    <div class="vertical"></div>
+                                    <div class="photo">上传头像</div>
+                                </div>
+                                <div class="support">只支持.jpg 格式</div>
+                            </div>
+
+                            <div class="upload-end"></div>
+                        </div>
+                    </div>
+                </div>
+                <section></section>
+                <!-- <div class="button">
+                        <button>取 消</button>
+                        <button>提 交</button>
+                    </div> -->
+
+            </div>
+
+            <!-- 修改密码 -->
+            <div class="alter-password" style="display: none">
+                <div class="tem-box">
+                    <div class="store">修改密码</div>
+                </div>
+                <div class="input">
+                    <form action="">
+                        <div class="phone">
+                            <select name="" id="">
+                                <option value="">+86</option>
+                                <option value="">+11</option>
+                            </select>
+                            <input type="text" placeholder="11 位⼿机号" class="cell"><br>
+                        </div>
+                        <div class="verify-code">
+                            <input type="text" placeholder="输⼊验证码" class="verify"><br>
+                            <div class="code">获取验证码</div>
+                        </div>
+                        <input type="text" placeholder="6 - 16 位密码，区分⼤⼩写" class="password"><br>
+                        <input type="text" placeholder="确认密码" class="confirm-password"><br>
+                        <input type="submit" value="提交" class="commit">
+                    </form>
+
+                </div>
+
+            </div>
+
+            <!-- 我的钱包 -->
+            <div class="wallet" style="display: none">
+                <div class="tem-box">
+                    <div class="store">我的钱包</div>
+                </div>
+                <div class="my_balance">
+                    <p class="balance">账户余额:</p>
+                    <p class="balance_quanto">0.00</p>
+                    <span id="bound">未绑定?点击</span>
+                    <span id="bound_container"></span>
+                    <span class="recharge" id="withdraw"><a>提现</a></span>
+                    <span class="recharge" id="recharge"><a>充值</a></span>
+                </div>
+                <div class="expend detail">
+                    <p>我的支出: <span>0.00</span></p>
+                    <div class="detail_tb">
+                        <table>
+                            <tbody>
+                            <tr>
+                                <th>流水号</th>
+                                <th>支付时间</th>
+                                <th>金额</th>
+                                <th>付款状态</th>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="income detail">
+                    <p>我的收入: <span>0.00</span></p>
+                    <div class="detail_tb">
+                        <table>
+                            <tbody>
+                            <tr>
+                                <th>节点</th>
+                                <th>时间</th>
+                                <th>收益</th>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="mask" style="display: none"></div>
+<div class="coverage coverMy" style="display: none">
+    <div class="tem-box">
+        <div class="store">明细</div>
+    </div>
+    <div class="node_table">
+        <table id="my_task_detail">
+        </table>
+
+
+    </div>
+</div>
+<div class="coverage coverList" style="display: none">
+    <div class="tem-box">
+        <div class="store">节点列表</div>
+    </div>
+    <div class="node_table">
+        <table id="node_detail">
+        </table>
+
+
+    </div>
+</div>
+</body>
+
+
+<script type="text/javascript">
+    // 设置选择框颜色
+    let unselected = "#E5E5E5";
+    let selected = "#333";
+    $(function () {
+        let choice = $("select");
+        choice.css("color", unselected);
+        $("option").css("color", selected);
+        choice.change(function () {
+            let selItem = $(this).val();
+            if (selItem === $(this).find('option:first').val()) {
+                $(this).css("color", unselected);
+            } else {
+                $(this).css("color", selected);
+            }
+        });
+    });
+
+    //新建节点
+    function newNode() {
+        $('.newNode').toggle();
+        var token = "Bearer " + localStorage.token;
+        $.ajax({
+            url: "/nodetype/",
+            type: "GET",
+            contentType: "application/json",
+            dataType: "json",
+            headers: {
+                Authorization: token,
+            },
+            async: false,
+            cache: false,
+            success: function (result) {
+                console.log(result);
+                $('select[name="fuck"]').empty()
+                let html;
+
+                for (v in result) {
+                    html += `
+                    <option value="${result[v]}">${result[v]}</option>
+                `
+                }
+
+
+                //result.foreach(function (v, i) {
+                //html += `
+                // <option value="${v}">${v}</option>
+                //`
+                //});
+                $('select[name="fuck"]').append(html);
+                {#location.reload()#}
+            },
+            error: function (result) {
+                console.log(result)
+
+            }
+        })
+    }
+
+    function confirm() {
+        var val = $('#inp').val()
+        let yes = $('select[name="fuck"]').val()
+        var token = "Bearer " + localStorage.token;
+        console.log(val, yes)
+        let data = {
+            "operate": "create",
+            "node_type": yes,
+            "num": val
+        }
+        console.log(data)
+        $.ajax({
+            url: "/create_node/",
+            type: "post",
+            data: JSON.stringify({
+                "operate": "create",
+                "node_type": yes,
+                "num": val
+            }),
+            contentType: "application/json",
+            dataType: "json",
+            headers: {
+                Authorization: token,
+            },
+            async: false,
+            cache: false,
+            success: function (result) {
+                console.log(result);
+                location.reload()
+
+
+            },
+            error: function (result) {
+                console.log(result)
+
+            }
+        })
+    }
+
+    {#for (var i = 0; i < val; i++) {#}
+    {#    $(".cont_aa").append("<tr>" + txt + "</tr>");#}
+    {#}#}
+        {#$('.newNode').hide();#}
+
+        var txt = $(".ontd").html();
+
+        function Add() {
+            $(".cont_aa").append("<tr>" + txt + "</tr>");
+        }
+
+        //开启一个
+
+        $("#flower").on("click", "span.open", function (event) {
+            var target = $(event.target);
+            let id = target.data('id')
+            var token = "Bearer " + localStorage.token;
+            let nn = {
+                "node_id": id
+            }
+            let node_list = []
+            node_list.push(nn)
+            let data = {
+                "operate": "open",
+                "nodes": node_list
+            }
+            console.log(data)
+            $.ajax({
+                url: "/node_operate/",
+                type: "post",
+                data: JSON.stringify({
+                    data
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    location.reload()
+                },
+                error: function (result) {
+                    console.log(result)
+
+                }
+            })
+        })
+
+        //开启所有
+        function openAll() {
+            let node_list = []
+            var token = "Bearer " + localStorage.token;
+            $("input[name='checks']").each(function (i, v) {
+                $(this).prop("checked");
+                $(this).data("id");
+                let list = []
+                if ($(this).prop("checked")) {
+                    let nn = {
+                        "node_id": $(this).data("id")
+                    }
+                    node_list.push(nn)
+                    list.push($(this).data("id"))
+                }
+
+            });
+            let data = {
+                "operate": "open",
+                "nodes": node_list
+            }
+            console.log(data)
+            $.ajax({
+                url: "/node_operate/",
+                type: "post",
+                data: JSON.stringify({
+                    data
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    location.reload()
+                },
+                error: function (result) {
+                    console.log(result)
+
+                }
+            })
+        }
+
+        //全选
+        $("#flower").on("click", "input#checks", function (event) {
+            var target = $(event.target);
+            let checked = target.prop("checked");
+            if (checked) {
+                $("input[name='checks']").each(function (i, v) {
+                    $(this).prop("checked", true);
+                });
+            } else {
+                $("input[name='checks']").each(function (i, v) {
+                    $(this).prop("checked", false);
+                });
+            }
+        })
+
+        function allChose(event) {
+            console.log($('#checks').prop('checked'))
+
+        }
+
+        //关闭一个
+        $("#flower").on("click", "span.close", function (event) {
+            console.log(event.target)
+            var target = $(event.target);
+            let id = target.data('id')
+            var token = "Bearer " + localStorage.token;
+            let nn = {
+                "node_id": id
+            }
+            let node_list = []
+            node_list.push(nn)
+            let data = {
+                "operate": "close",
+                "nodes": node_list
+            }
+            console.log(data)
+            $.ajax({
+                url: "/node_operate/",
+                type: "post",
+                data: JSON.stringify({
+                    data
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    location.reload()
+                },
+                error: function (result) {
+                    console.log(result)
+
+                }
+            })
+        })
+
+        //关闭全部
+        function closeAll() {
+            let node_list = []
+            var token = "Bearer " + localStorage.token;
+            $("input[name='checks']").each(function (i, v) {
+                $(this).prop("checked");
+                $(this).data("id");
+                let list = []
+                if ($(this).prop("checked")) {
+                    let nn = {
+                        "node_id": $(this).data("id")
+                    }
+                    node_list.push(nn)
+                    list.push($(this).data("id"))
+                }
+
+            });
+            let data = {
+                "operate": "close",
+                "nodes": node_list
+            }
+            console.log(data)
+            $.ajax({
+                url: "/node_operate/",
+                type: "post",
+                data: JSON.stringify({
+                    data
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    location.reload()
+                },
+                error: function (result) {
+                    console.log(result)
+
+                }
+            })
+        }
+
+        //删除
+
+        $("#flower").on("click", "span.del", function (event) {
+            console.log(event.target)
+            var target = $(event.target);
+            let id = target.data('id')
+            var token = "Bearer " + localStorage.token;
+            let nn = {
+                "node_id": id
+            }
+            let node_list = []
+            node_list.push(nn)
+            let data = {
+                "operate": "delete",
+                "nodes": node_list
+            }
+            console.log(data)
+            $.ajax({
+                url: "/node_operate/",
+                type: "post",
+                data: JSON.stringify({
+                    data
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    location.reload()
+                },
+                error: function (result) {
+                    console.log(result)
+
+                }
+            })
+        })
+
+
+        // 任务发布
+        $('#task').click(function () {
+            $(".task").siblings().css("display", "none");
+            $(".task").css("display", "block");
+            $('#task img:eq(0)').css("display", "none");
+            $('#task img:eq(1)').css("display", "block");
+            $('#task div').css("color", "#427CFF");
+            $('#task').siblings().children("img").hide();
+            $('#task').siblings().children(".now").show();
+            $('#task').siblings().children().css("color", "#000");
+        });
+
+
+        //    任务发表
+        $(function () {
+            $("#task_submit").click(function () {
+                var _this = this;
+                var task_type = $(".type").val();
+                var data = $(".data").val();
+                var deadline = $(".deadline").val();
+                var offer = $(".offer").val();
+                var token = "Bearer " + localStorage.token;
+                console.log(token);
+
+
+                $.ajax({
+                    url: "/task/",
+                    type: "post",
+                    data: JSON.stringify({
+                        "category": task_type,
+                        "url": data,
+                        "status": 0,
+                        "deadline": deadline,
+                        "price": offer,
+                    }),
+                    contentType: "application/json",
+                    dataType: "json",
+                    headers: {
+                        Authorization: token,
+                    },
+                    async: false,
+                    cache: false,
+                    success: function (result) {
+                        console.log(result);
+                        console.log("++++++++++++++++++++++++++++++++++++++++++++++++");
+                        $(_this).hide();
+                        $("#task_input").css("display", "none");
+                        var ele = "<div class=\"task_mate comment\" style=\"display: block\">\n" +
+                            "<img class=\"isSuccess\" src=\"../static/images/succeed.svg\" alt=\"\">\n" +
+                            "<p>任务已匹配成功</p>\n" +
+                            "<p>节点数:" + result.useful_node_nums + "个，预计完成时间:" + result.planned_complete_time + "</p>\n" +
+                            "<p>支付佣金 : <span>" + result.price + "元</span></p>\n" +
+                            "<div class=\"task_pay\">\n" +
+                            "<input type=\"hidden\"  id=\"order_id\" value=\"" + result.order_id + "\">" +
+                            "<div>\n" +
+                            "<div class=\"pay_ma_bord\">\n" +
+                            "<img class=\"pay_ma\" src=\"" + result.wxpay_qrcode + "\" alt=\"\">\n" +
+                            "</div>\n" +
+                            "<div class=\"pay_class\"><img src=\"../static/images/微信.svg\" alt=\"\"> <span>微信支付</span>\n" +
+                            "</div>\n" +
+                            "</div>\n" +
+                            "<div>\n" +
+                            "<div class=\"pay_ma_bord\">\n" +
+                            "<img class=\"pay_ma\" src=\"../static/images/ma.png\" alt=\"\">\n" +
+                            "</div>\n" +
+                            "<div class=\"pay_class\"><img src=\"../static/images/支付宝.svg\" alt=\"\"> <span>支付宝</span>\n" +
+                            "</div>\n" +
+                            "</div>\n" +
+                            "</div>\n" +
+                            "</div>\n";
+                        $(ele).insertAfter($("#task_submit"));
+
+                        timer = setInterval(function () {
+                            pay_status(token, result.order_id)
+                        }, 3000)
+
+                    },
+                    error: function (result) {
+                        console.log(result);
+                        $(_this).hide();
+                        $("#task_input").css("display", "none");
+                        $(".task_field").css("display", "block");
+                    }
+                })
+
+            })
+        });
+
+        // 任务发布失败返回修改标签
+        $(".task_back").click(function () {
+            $("#task_submit").show();
+            $("#task_input").show();
+            $(".task_field").hide();
+        });
+
+        // 我的节点
+        $('#node').click(function () {
+            $(".node").siblings().css("display", "none");
+            $(".node").css("display", "block");
+            $('#node img:eq(0)').css("display", "none");
+            $('#node img:eq(1)').css("display", "block");
+            $('#node div').css("color", "#427CFF");
+            $('#node').siblings().children("img").hide();
+            $('#node').siblings().children(".now").show();
+            $('#node').siblings().children().css("color", "#000");
+
+
+            $(function () {
+                let token = "Bearer " + localStorage.token;
+                let htmlList = `
+             <tr>
+                <th><input type="checkbox" name="checkbox" id="checks"></th>
+                <th>名称/ID</th>
+                <th>类型</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+
+            `
+                $.ajax({
+                    url: "/node/",
+                    contentType: "application/json",
+                    headers: {
+                        Authorization: token,
+                    },
+                    Type: 'GET',
+                    async: false,
+                    cache: false,
+                    success: function (nodes) {
+                        console.log(nodes)
+                        var html = htmlList;
+
+                        $("#flower").empty();
+                        nodes.forEach(function (v, i) {
+                            console.log(v)
+                            console.log(i)
+                            html += `<tr class="ontd">
+                            <td><input  type="checkbox"  data-id='${v.node_id}' name="checks" id=""></td>
+                            <td>${v.name}</td>
+                            <td>${v.node_id}</td>
+                            <td>${v.state}</td>
+                            <td>
+                                <span onclick="Add()">拷贝</span>
+                                <span  data-id='${v.node_id}' class="del">删除</span>
+                                <span  data-id='${v.node_id}'  class="open">开启</span>
+                                <span  data-id='${v.node_id}' class="close">关闭</span>
+                            </td>
+                        </tr>`
+                        })
+                        //数据追加到html
+                        $("#flower").append(html)
+
+
+                    },
+                    fail: function (er) {
+                        console.log(er)
+
+                    }
+                })
+            });
+
+
+        });
+
+        //节点
+        $(".node_price li span").click(function () {
+            var parent = $(this).parent();
+            var a = parent.children().eq(0).text();
+            var b = parent.children().eq(1).val();
+            var c = parent.children().eq(2).text();
+            parent.siblings().children().eq(1).val("");
+            if (!b) {
+                alert("请填数值!!");
+                return
+            }
+            var text = a + b + c;
+            parent.parent().parent().children("span").eq(0).text(text)
+        });
+
+
+        //蒙层
+        $(".mask").click(function () {
+            $(this).hide();
+            $(".coverage").hide();
+        });
+
+        // 我的接单
+        $('#order').click(function () {
+            $(".order").siblings().css("display", "none");
+            $(".order").css("display", "block");
+            $('#order img:eq(0)').css("display", "none");
+            $('#order img:eq(1)').css("display", "block");
+            $('#order div').css("color", "#427CFF");
+            $('#order').siblings().children("img").hide();
+            $('#order').siblings().children(".now").show();
+            $('#order').siblings().children().css("color", "#000");
+            var token = "Bearer " + localStorage.token;
+            $.ajax({
+                url: "/task/?received=1",
+                contentType: "application/json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (tasks) {
+                    console.log(tasks);
+                    var ele0 = "";
+                    $("#my_task").empty();
+                    var order_selector = $(".order .products .main");
+                    order_selector.eq(1).empty();
+                    order_selector.eq(2).empty();
+                    $.each(tasks, function (i, task) {
+                        ele0 = " <div class=\"main_cont\">\n" +
+                            "                            <div class=\"cont_introduce\">\n" +
+                            "                                <p>提交数据源url：" + task.url + "</p>\n" +
+                            "                                <p><span>数据类型：" + task.category + "</span><span>佣金：" + task.price + "元</span></p>\n" +
+                            "                                <p><span>发布时间：" + task.publish_time + "</span><span>剩余时间：" + task.left_time + "</span></p>\n" +
+                            "                            </div>\n" +
+                            "                            <div class=\"cont_piay\">\n" +
+                            "                                <span class=\"my_detail\" data-id=\"" + task.id + "\">明细</span>\n" +
+                            "                            </div>\n" +
+                            "                        </div>";
+                        $("#my_task").append(ele0);
+                        if (task.status !== "已完成") {
+                            order_selector.eq(1).append(ele0)
+                        } else {
+                            order_selector.eq(2).append(ele0)
+                        }
+                    });
+                    //我的接单明细
+                    $(".my_detail").click(function () {
+                        $(".mask").show();
+                        $(".coverMy").show();
+                        let task_id = $(this).attr("data-id");
+                        let ele = "<tr>\n" +
+                            "                <th>节点名</th>\n" +
+                            "                <th>节点IP</th>\n" +
+                            "                <th>节点类型</th>\n" +
+                            "                <th>节点创建时间</th>\n" +
+                            "                <th>完成任务数</th>\n" +
+                            "                <th>失败任务数</th>\n" +
+                            "                <th>时单价</th>\n" +
+                            "                <th>总收益</th>\n" +
+                            "            </tr>\n";
+                        $.ajax({
+                            url: "/task/" + task_id,
+                            contentType: "application/json",
+                            headers: {
+                                Authorization: token,
+                            },
+                            async: false,
+                            cache: false,
+                            success: function (result) {
+                                console.log(result);
+                                let task_node_list = result.tasknode_set;
+                                $("#my_task_detail").empty();
+                                $.each(task_node_list, function (i, task) {
+                                    ele +=
+                                        "            <tr>\n" +
+                                        "                <td>" + task.node_detail.name + "</td>\n" +
+                                        "                <td>" + task.node_detail.ip + "</td>\n" +
+                                        "                <td>" + task.node_detail.category + "</td>\n" +
+                                        "                <td>" + formateDate(task.node_detail.create_time) + "</td>\n" +
+                                        "                <td>" + task.node_detail.succeed_tasks + "</td>\n" +
+                                        "                <td>" + task.node_detail.failed_tasks + "</td>\n" +
+                                        "                <td>" + task.node_detail.unit_price + "</td>\n" +
+                                        "                <td>" + task.node_detail.total_revenue + "</td>\n" +
+                                        "            </tr>"
+                                });
+                                $("#my_task_detail").append(ele)
+                            }
+                        });
+                    });
+                }
+            })
+
+        });
+
+
+        $(function () {
+            $(".order .tab-item").click(function () {
+                $(this).addClass("active").siblings().removeClass("active");
+                $(".order .main").eq($(this).index()).show().siblings().hide();
+            })
+        });
+
+
+        // 修改密码
+        $('#alter-password').click(function () {
+            $(".alter-password").siblings().css("display", "none");
+            $(".alter-password").css("display", "block");
+            $('#alter-password img:eq(0)').css("display", "none");
+            $('#alter-password img:eq(1)').css("display", "block");
+            $('#alter-password div').css("color", "#427CFF");
+            $('#alter-password').siblings().children("img").hide();
+            $('#alter-password').siblings().children(".now").show();
+            $('#alter-password').siblings().children().css("color", "#000");
+        });
+
+        // 我的钱包
+        $('#wallet').click(function () {
+            $(".wallet").siblings().css("display", "none");
+            $(".wallet").css("display", "block");
+            $('#wallet img:eq(0)').css("display", "none");
+            $('#wallet img:eq(1)').css("display", "block");
+            $('#wallet div').css("color", "#427CFF");
+            $('#wallet').siblings().children("img").hide();
+            $('#wallet').siblings().children(".now").show();
+            $('#wallet').siblings().children().css("color", "#000");
+
+
+            var token = "Bearer " + localStorage.token;
+
+            // 同步请求我的支出接口
+            $.ajax({
+                url: "/payment/",
+                contentType: "application/json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    let total_cost = 0;
+                    let ele0 = "<tr>\n" +
+                        "<th>流水号</th>\n" +
+                        "<th>支付时间</th>\n" +
+                        "<th>金额</th>\n" +
+                        "<th>付款状态</th>\n" +
+                        "</tr>";
+                    $(".expend .detail_tb table tbody").empty();
+                    $(".expend .detail_tb table tbody").append(ele0);
+
+                    for (let i = 0; i < result.length; i++) {
+                        var ele = "";
+                        console.log("++++++++++++++++++++++");
+                        let pay_time = result[i].pay_at ? formateDate(result[i].pay_at) : "";
+                        ele = "<tr>\n" +
+                            "<td>" + result[i].serial_number + "</td>\n" +
+                            "<td>" + pay_time + "</td>\n" +
+                            "<td>" + result[i].amount_money + "</td>\n" +
+                            "<td>" + result[i].already_pay + "</td>\n" +
+                            "<td style=\"display: none;\">" + result[i].id + "</td>\n" +
+                            "</tr>";
+                        if (result[i].already_pay === "支付成功") {
+                            total_cost += parseFloat(result[i].amount_money);
+                        }
+
+
+                        $(".expend .detail_tb table tbody").append(ele)
+
+                    }
+                    $(".wallet .expend p span").text(Math.round(total_cost * 100) / 100);
+
+                    // 同步请求我的收入接口
+                    $.ajax({
+                        url: "/tasknode/",
+                        contentType: "application/json",
+                        headers: {
+                            Authorization: token,
+                        },
+                        async: false,
+                        cache: false,
+                        success: function (result) {
+                            let total_income = 0;
+                            let ele_0 = "<tr>\n" +
+                                "<th>节点</th>\n" +
+                                "<th>时间</th>\n" +
+                                "<th>收益</th>\n" +
+                                "</tr>";
+                            $(".income .detail_tb table tbody").empty();
+                            $(".income .detail_tb table tbody").append(ele_0);
+
+                            $.each(result, function (i, profile_tasknode) {
+                                let ele_ = "<tr>\n" +
+                                    "<td>" + profile_tasknode.node_detail.name + "</td>\n" +
+                                    "<td>" + formateDate(profile_tasknode.start_time) + "</td>\n" +
+                                    "<td>" + profile_tasknode.this_time_revenue + "</td>\n" +
+                                    "</tr>";
+
+                                total_income += parseFloat(profile_tasknode.this_time_revenue);
+                                console.log(total_income);
+                                $(".income .detail_tb table tbody").append(ele_)
+
+                            });
+
+                            $(".wallet .income p span").text(Math.round(total_income * 100) / 100);
+
+                            // 同步请求我的余额接口
+                            $.ajax({
+                                url: "/myaccount/",
+                                contentType: "application/json",
+                                headers: {
+                                    Authorization: token,
+                                },
+                                async: false,
+                                cache: false,
+                                success: function (result) {
+                                    let balance = parseFloat(result[0].balance);
+                                    console.log(result);
+                                    $(".wallet .my_balance .balance_quanto").text(Math.round(balance * 100) / 100);
+                                }
+                            })
+
+                        }
+                    })
+
+
+                }
+            })
+
+
+        });
+
+
+        // 提现功能
+
+
+        // 个人资料
+        $('#personal').click(function () {
+            $(".personal").siblings().css("display", "none");
+            $(".personal").css("display", "block");
+            $('#personal img:eq(0)').css("display", "none");
+            $('#personal img:eq(1)').css("display", "block");
+            $('#personal div').css("color", "#427CFF");
+            $('#personal').siblings().children("img").hide();
+            $('#personal').siblings().children(".now").show();
+            $('#personal').siblings().children().css("color", "#000");
+
+            var token = "Bearer " + localStorage.token;
+            $.ajax({
+                url: "/userprofile/",
+                contentType: "application/json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (profile) {
+                    console.log(profile);
+                    var person_profile = $(".personal-cont .left").find("input");
+                    $(".personal-cont .left .sex").val(profile.gender);
+
+
+                    let selItem = $(".sex").val();
+                    if (selItem === $(".sex").find('option:first').val()) {
+                        $(".sex").css("color", unselected);
+                    } else {
+                        $(".sex").css("color", selected);
+                    }
+
+                    person_profile.eq(0).val(profile.username);
+                    person_profile.eq(1).val(profile.birthday ? profile.birthday : "");
+                    person_profile.eq(2).val(profile.address ? profile.address : "");
+                },
+                error: function () {
+                    window.location.href = "/login"
+                }
+            })
+
+        });
+
+        // 取消修改个人资料
+        $(function () {
+            var token = "Bearer " + localStorage.token;
+
+            $("#profile_cancel").on("click", function () {
+                $.ajax({
+                    url: "/userprofile/",
+                    contentType: "application/json",
+                    headers: {
+                        Authorization: token,
+                    },
+                    async: false,
+                    cache: false,
+                    success: function (profile) {
+                        console.log(profile);
+                        var person_profile = $(".personal-cont .left").find("input");
+                        $(".personal-cont .left .sex").val(profile.gender);
+                        person_profile.eq(0).val(profile.username);
+                        person_profile.eq(1).val(profile.birthday ? profile.birthday : "");
+                        person_profile.eq(2).val(profile.address ? profile.address : "");
+                        $(".upload-end").empty();
+                    },
+                    error: function () {
+                        window.location.href = "/login"
+                    }
+                })
+
+            })
+        });
+
+
+        // 提交修改个人资料
+        $(function () {
+            var token = "Bearer " + localStorage.token;
+            $("#profile_submit").on("click", function () {
+                var that = this;
+
+                var person_profile = $(".personal-cont .left").find("input");
+                var username = person_profile.eq(0).val();
+                var gender = $(".personal-cont .left .sex").val();
+                var birthday = person_profile.eq(1).val();
+                var address = person_profile.eq(2).val();
+                var file = $(".upload-end img").attr("src");
+
+                $.ajax({
+                    type: "patch",
+                    url: "/userprofile/",
+                    contentType: "application/json",
+                    headers: {
+                        Authorization: token,
+                    },
+                    data: JSON.stringify({
+                        "username": username,
+                        "gender": gender,
+                        "birthday": birthday,
+                        "address": address,
+                        "file": file,
+                    }),
+                    cache: false,
+                    async: false,
+                    success: function (profile) {
+                        alert("资料更新成功");
+                        var profile_box = $(that).parents(".content").find(".nickname");
+                        profile_box.find("p").html(profile.username);
+                        profile_box.find("img").attr("src", profile.avatar);
+                    },
+                    error: function () {
+                        alert("用户名已存在，请重新填写！")
+                    }
+                })
+
+            })
+        });
+
+
+        // 上传店铺照
+        var pic = document.getElementById("pic");
+        console.log(pic);
+        pic.onchange = function (e) {
+            var img = document.createElement("img");
+            //获取用户上传的文件对象
+            var theFile = pic.files[0];
+            //实例化一个文件读取器
+            var fileReader = new FileReader();
+            //将用户上传的文件对象作为参数，传入文件读取器的方法readAsDataURL
+            fileReader.readAsDataURL(theFile);
+            //文件读取器方法执行完毕后调用函数
+            fileReader.onload = function () {
+                //文件读取器的result属性即fileReader.result，就是上传文件的dataURL
+                img.src = fileReader.result;
+            };
+
+            var upload_end = document.getElementsByClassName("upload-end");
+            upload_end[0].innerHTML = "";
+            upload_end[0].appendChild(img);
+
+        };
+        // ****************************************************
+        $(".type").change(function () {
+            if ($(".type").val() == "always") {
+                $('.always').css("display", "block");
+                $('.annex').css("display", "none");
+            }
+            if ($(".type").val() == "annex") {
+                $('.annex').css("display", "block");
+                $('.always').css("display", "none");
+            }
+        });
+
+
+        // *****************************************************
+        $(".lump .span1 input.radio").on("change", function () {
+            if ($(this).val()) {
+                $(this).next().attr({src: "../static/images/check-circle.svg"});
+                $(this).parent().siblings().find("img").attr({src: "../static/images/check-circle-o.svg"})
+            } else {
+                $(this).next().attr({src: "../static/images/check-circle-o.svg"});
+                $(this).parent().siblings().find("img").attr({src: "../static/images/check-circle.svg"})
+            }
+        });
+
+
+        // 加载任务列表
+        $('#task_list').click(function () {
+            $(".task_list").siblings().css("display", "none");
+            $(".task_list").css("display", "block");
+            $('#task_list img:eq(0)').css("display", "none");
+            $('#task_list img:eq(1)').css("display", "block");
+            $('#task_list div').css("color", "#427CFF");
+            $('#task_list').siblings().children("img").hide();
+            $('#task_list').siblings().children(".now").show();
+            $('#task_list').siblings().children().css("color", "#000");
+
+
+            var token = "Bearer " + localStorage.token;
+            $.ajax({
+                url: "/task",
+                contentType: "application/json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (tasks) {
+                    console.log(tasks);
+                    var ele0 = "";
+                    var ele1 = "";
+                    $("#main_cont_list").empty();
+                    $(".task_list .products .main").eq(2).empty();
+                    $(".task_list .products .main").eq(3).empty();
+                    $(".task_list .products .main").eq(1).empty();
+                    $.each(tasks, function (i, task) {
+                        ele0 = "<div class=\"main_cont\">\n" +
+                            "<div class=\"cont_introduce\">\n" +
+                            "<p>提交数据源url：" + task.url + "</p>\n" +
+                            "<p><span>数据类型：数据抓取</span><span>佣金：" + task.price + "</span></p>\n" +
+                            "<p><span>发布时间：" + task.publish_time + "</span><span>剩余时间：" + task.left_time + "</span></p>\n" +
+                            "</div>\n" +
+                            "<div class=\"cont_piay\">\n" +
+                            "<span class=\"detail_but\">明细</span>\n" +
+                            "</div>\n" + "<div style='display: none'>" + task.id + "</div>" +
+                            "</div>";
+
+                        ele1 = "<div class=\"main_cont\">\n" +
+                            "<div class=\"cont_introduce\">\n" +
+                            "<p>提交数据源url：" + task.url + "</p>\n" +
+                            "<p><span>数据类型：数据抓取</span><span>佣金：" + task.price + "</span></p>\n" +
+                            "<p><span>发布时间：" + task.publish_time + "</span><span>剩余时间：" + task.left_time + "</span></p>\n" +
+                            "</div>\n" +
+                            "<div class=\"cont_piay task_piay1\">\n" +
+                            "<span>" + task.status + "</span>\n" +
+                            "</div>\n" + "<div style='display: none'>" + task.id + "</div>" +
+                            "</div>";
+                        if (task.status !== "已付款") {
+                            $("#main_cont_list").append(ele1);
+                            if (task.status === "已接单" || "待接单") {
+                                $(".task_list .products .main").eq(2).append(ele1);
+                            }
+                            if (task.status === "已完成") {
+                                $(".task_list .products .main").eq(3).append(ele1);
+                            }
+                        } else {
+                            $("#main_cont_list").append(ele0);
+                            $(".task_list .products .main").eq(1).append(ele0);
+                        }
+                    });
+
+                    $(".detail_but").click(function () {
+                        var task_id = $(this).parent().next().text();
+                        console.log("+++++++++++++++++++++++++++++", task_id);
+                        $.ajax({
+                            url: "/task/" + task_id,
+                            contentType: "application/json",
+                            headers: {
+                                Authorization: token,
+                            },
+                            cache: false,
+                            success: function (task) {
+                                var task_nodes = task.tasknode_set;
+                                if (task.tasknode_set.length >= 1) {
+                                    let ele1 = "<tr>\n" +
+                                        "<th>节点名</th>\n" +
+                                        "<th>节点IP</th>\n" +
+                                        "<th>节点类型</th>\n" +
+                                        "<th>开始执行时间</th>\n" +
+                                        "<th>执行结果</th>\n" +
+                                        "</tr>\n";
+                                    var color_class = "";
+                                    $("#node_detail").empty();
+                                    $.each(task_nodes, function (i, tasknode) {
+                                        console.log(tasknode);
+                                        if (tasknode.status === '执行') {
+                                            color_class = "blue_dot"
+                                        } else if (tasknode.status === '失败') {
+                                            color_class = "red_dot"
+                                        } else if (tasknode.status === '成功') {
+                                            color_class = "green_dot"
+                                        }
+                                        ele1 += "<tr>\n" +
+                                            "<td>" + tasknode.node_detail.name + "</td>\n" +
+                                            "<td>" + tasknode.node_detail.ip + "</td>\n" +
+                                            "<td>" + tasknode.node_detail.category + "</td>\n" +
+                                            "<td>" + formateDate(tasknode.start_time) + "</td>\n" +
+                                            "<td><span class=\"" + color_class + "\"></span><span>" + tasknode.status + "</span></td>\n" +
+                                            "</tr>\n";
+                                    });
+                                    $("#node_detail").append(ele1);
+                                    $(".mask").show();
+                                    $(".coverList").show();
+                                }
+                                else {
+                                    alert("页面发生错误，节点未找到！");
+                                }
+
+                            }
+                        })
+                    });
+                }
+
+
+            });
+
+        });
+        $(function () {
+            $(".task_list .tab-item").click(function () {
+                $(this).addClass("active").siblings().removeClass("active");
+                $(".task_list .main").eq($(this).index()).show().siblings().hide();
+            })
+        });
+
+
+        // 加载用户头像,以及用户信息
+       // 加载用户头像,以及用户信息
+    $(function () {
+
+        console.log(window.location.href)
+        console.log(window.location.search.indexOf("nickname"))
+        console.log(encodeURI(window.location.href))
+        if(window.location.search.indexOf("nickname") != -1){
+
+            let href = window.location.search.split("&")
+            let username = href[0].split("=")[1];
+            username=decodeURI(username)
+            let img = href[1].split("=")[1];
+            console.log(username,"9999999999999")
+
+            {#let username = "asdfajsd"#}
+            let password = 'woshimima'
+             $.ajax({
+                type: "POST",
+                url: "/register/simple/",
+                data: JSON.stringify({"username": username, "password": password, "headimgurl":img, "avatar": img}),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (result) {
+                     $.ajax({
+                        type: "POST",
+                        url: "/api-token-auth/",
+                        data: JSON.stringify({"username": username, "password": password}),
+                        contentType: "application/json",
+                        success: function (token) {
+                            console.log(token);
+
+                            localStorage.token = token.access;
+                            $(".head-right .nickname p").html(username);
+                            $(".head-right .nickname img").attr("src", img)
+                            {#window.location.href = "/particular"#}
+                        },
+                        error: function () {
+                            alert("登录名或者密码错误，请重新输入");
+                            return false
+                        }
+                    })
+                },
+                error: function (result) {
+                    if (result.status === 400) {
+                        $.ajax({
+                        type: "POST",
+                        url: "/api-token-auth/",
+                        data: JSON.stringify({"username": username, "password": password}),
+                        contentType: "application/json",
+                        success: function (token) {
+                            console.log(token);
+
+                            localStorage.token = token.access;
+                            $(".head-right .nickname p").html(username);
+                            $(".head-right .nickname img").attr("src", img)
+                            {#window.location.href = "/particular"#}
+                        },
+                        error: function () {
+                            alert("登录名或者密码错误，请重新输入");
+                            return false
+                        }
+                    })
+                        {#alert("该邮箱或用户名已经被注册，请重新填写！")#}
+                    }
+                    if (result.status === 403) {
+                        alert("未知错误！")
+                    }
+                    {#window.location.href = "/register"#}
+                }
+
+            })
+        }else {
+            console.log("2222222222222222")
+            var token = "Bearer " + localStorage.token;
+             // 请求用户个人信息
+            $.ajax({
+                url: "/userprofile/",
+                contentType: "application/json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (profile) {
+                    let user_id = profile.id;
+                    localStorage.user_id = user_id;
+                    if (profile.avatar_url.search("default.jpg") !== -1) {
+                        $(".head-right .nickname p").html(profile.username);
+                        $(".head-right .nickname img").attr("src", "../media/" + profile.avatar_url)
+
+                    } else {
+                        $(".head-right .nickname p").html(profile.username);
+                        $(".head-right .nickname img").attr("src", profile.avatar_url)
+                    }
+
+                    // 发送用户信息，获取节点信息，绑定节点到用户
+                    $.ajax({
+                        url: "",
+                        type: "POST",
+                        data: JSON.stringify({"user_id": user_id}),
+                        contentType: "application/json",
+                        async: false,
+                        cache: false,
+                        success: function (node_info) {
+                            $.post("/node", {node: node_info}, function (data) {
+                                console.log("节点创建成功！！！！！！！！！！！")
+                            }, "json")
+                        }
+
+                    })
+
+                },
+                error: function () {
+                    {#window.location.href = "/login"#}
+                }
+            })
+        }
+
+
+    });
+
+
+        // 用户退出
+        $(function () {
+            $(".logout").click(function () {
+                localStorage.clear();
+                window.location.href = "/index"
+            })
+        });
+
+
+        // 时间格式转换
+        function formateDate(datetime) {
+            function addDateZero(num) {
+                return (num < 10 ? "0" + num : num);
+            }
+
+            let d = new Date(datetime);
+            return d.getFullYear() + '-' + addDateZero(d.getMonth() + 1) + '-' + addDateZero(d.getDate()) + ' ' + addDateZero(d.getHours()) + ':' + addDateZero(d.getMinutes()) + ':' + addDateZero(d.getSeconds());
+        }
+
+        // 获取支付状态，并完成跳转
+        function pay_status(token, order_id) {
+            $.ajax({
+                url: "/payment/" + order_id + "/",
+                type: "GET",
+                headers: {
+                    Authorization: token,
+                },
+                success: function (data) {
+                    console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+                    if (data.already_pay === "支付成功") {
+                        clearInterval(timer);
+                        alert("支付成功");
+                        window.location.reload();
+                    }
+                }
+            })
+
+        }
+
+
+        //时间选择器, 执行一个laydate实例
+        laydate.render({
+            elem: '#dead_line',
+            type: 'datetime'
+        });
+
+        // 用户出生年月
+        laydate.render({
+            elem: '#birthday',
+            type: 'date'
+        });
+
+
+        // 提现
+        $(function () {
+            $("#withdraw").click(function () {
+                var that = this;
+                var token = "Bearer " + localStorage.token;
+
+                $.ajax({
+                    url: "/myaccount/",
+                    contentType: "application/json",
+                    headers: {
+                        Authorization: token,
+                    },
+                    async: false,
+                    cache: false,
+                    success: function (result) {
+                        console.log(result)
+                        let balance = parseFloat(result[0].balance);
+
+                        if (balance >= 100) {
+                            $.ajax({
+                                url: "/withdraw/",
+                                type: "POST",
+                                contentType: "application/json",
+                                headers: {
+                                    Authorization: token,
+                                },
+                                data: JSON.stringify({"amount": 100}),
+                                async: false,
+                                cache: false,
+                                success: function (res) {
+                                    let result = res.data;
+                                    if (result === "unbound") {
+                                        alert("您还未绑定微信账户，无法转账!")
+                                    } else if (result === "success") {
+                                        let balance_ = balance - 100;
+                                        $(that).prev().html(balance_);
+                                        alert("提现成功！")
+                                    } else {
+                                        alert("提现失败，请稍后重试!")
+                                    }
+                                }
+                            })
+                        } else {
+                            alert("对不起，当账户余额大于100时，才能提现！")
+                        }
+
+                    }
+                });
+
+            })
+        });
+
+        $("#bound").click(
+            function () {
+                let user_id = localStorage.user_id;
+                let token = "Bearer " + localStorage.token;
+                let bound_value = $(this).html();
+                let that = this;
+                if (bound_value === "未绑定?点击") {
+                    $(this).html("取消")
+                } else {
+                    $(this).html("未绑定?点击")
+                }
+                $.ajax({
+                    url: "/bound/",
+                    type: "POST",
+                    headers: {
+                        Authorization: token,
+                    },
+                    data: JSON.stringify({"user_id": user_id}),
+                    contentType: "application/json",
+                    async: false,
+                    cache: false,
+                    success: function (result) {
+                        let data = result.data;
+                        console.log(data);
+                        if (data) {
+                            if ($("#bound_container").is(":visible")) {
+                                $("#bound_container").hide();
+                                alert("微信绑定成功！")
+                            } else {
+                                $("#bound_container").hide();
+                                alert("你已经绑定过微信账户！");
+                                $(that).html("未绑定?点击")
+                            }
+                        } else {
+
+                            var content = "iframe{width: 150; height: 150;} .impowerBox .qrcode {width: 100px;}.impowerBox .title {display: none;}.impowerBox .info {width: 200px; display: none;} body {font-size: 10px; color:red}";
+                            var blob = new Blob([content], {type: "text/css;charset=utf-8"});
+                            var reader = new FileReader();
+                            reader.readAsDataURL(blob);
+                            reader.onload = function (e) {
+                                var obj = new WxLogin({
+                                    self_redirect: true,
+                                    id: "bound_container",
+                                    appid: "wxbb19e286afae10db",
+                                    scope: "snsapi_login",
+                                    response_type: "code",
+                                    {#redirect_uri: "http://192.168.3.84:8000/bound",#}
+                                    redirect_uri: "http://127.0.0.1:8000/bound",
+                                    state: user_id,
+                                    style: "",
+                                    href: this.result
+                                });
+
+                            };
+
+                            if (bound_value === "取消") {
+                                $("#bound_container").hide();
+                            } else {
+                                $("#bound_container").show();
+                                alert("请微信扫码绑定，谢谢")
+                            }
+
+                        }
+
+                    }
+                });
+
+
+            }
+        );
+
+
+</script>
+
+</html>

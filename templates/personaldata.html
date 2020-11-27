@@ -1,0 +1,190 @@
+{% extends './particular.html' %}
+
+
+{% block content %}
+    <!-- 个人资料 -->
+    <div class="personal" >
+                <div class="tem-box">
+                    <div class="store">个人资料</div>
+                </div>
+                <div class="personal-cont">
+                    <div class="left">
+                        <p>基本资料</p>
+                        <input type="text" placeholder="用户名" class="name"><br>
+                        <select name="" class="sex">
+                            <option value="请选择">请选择</option>
+                            <option value="male">男</option>
+                            <option value="female">女</option>
+                        </select><br>
+                        <input type="text" placeholder="生日" class="birthday" id="birthday"><br>
+                        <input type="text" placeholder="地址" class="region"><br>
+                        <input type="file" name="pic" id="pic" accept="image/*"/><br>
+                        <div class="button">
+                            <input type="submit" value="取 消" class="cancel" id="profile_cancel">
+                            <input type="submit" value="提 交" class="refer" id="profile_submit">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <p>修改头像</p>
+                        <div class="upload-head">
+                            <div class="upload-box">
+                                <div class="upload">
+                                    <div class="across"></div>
+                                    <div class="vertical"></div>
+                                    <div class="photo">上传头像</div>
+                                </div>
+                                <div class="support">只支持.jpg 格式</div>
+                            </div>
+
+                            <div class="upload-end"></div>
+                        </div>
+                    </div>
+                </div>
+                <section></section>
+                <!-- <div class="button">
+                        <button>取 消</button>
+                        <button>提 交</button>
+                    </div> -->
+
+        </div>
+
+    <script>
+    // 个人资料
+        $(function () {
+            $(".personal").siblings().css("display", "none");
+            $(".personal").css("display", "block");
+            $('#personal img:eq(0)').css("display", "none");
+            $('#personal img:eq(1)').css("display", "block");
+            $('#personal div').css("color", "#427CFF");
+            $('#personal').siblings().children("img").hide();
+            $('#personal').siblings().children(".now").show();
+            $('#personal').siblings().children().css("color", "#fafafa");
+
+            var token = "Bearer " + localStorage.token;
+            $.ajax({
+                url: "/userprofile/",
+                contentType: "application/json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (profile) {
+                    console.log(profile);
+                    var person_profile = $(".personal-cont .left").find("input");
+                    $(".personal-cont .left .sex").val(profile.gender);
+
+
+                    let selItem = $(".sex").val();
+                    $(".sex").css("color", '#fff');
+
+                    person_profile.eq(0).val(profile.username);
+                    person_profile.eq(1).val(profile.birthday ? profile.birthday : "");
+                    person_profile.eq(2).val(profile.address ? profile.address : "");
+                },
+                error: function () {
+                    window.location.href = "/login"
+                }
+            })
+
+        });
+
+        // 取消修改个人资料
+        $(function () {
+            var token = "Bearer " + localStorage.token;
+
+            $("#profile_cancel").on("click", function () {
+                $.ajax({
+                    url: "/userprofile/",
+                    contentType: "application/json",
+                    headers: {
+                        Authorization: token,
+                    },
+                    async: false,
+                    cache: false,
+                    success: function (profile) {
+                        console.log(profile);
+                        var person_profile = $(".personal-cont .left").find("input");
+                        $(".personal-cont .left .sex").val(profile.gender);
+                        person_profile.eq(0).val(profile.username);
+                        person_profile.eq(1).val(profile.birthday ? profile.birthday : "");
+                        person_profile.eq(2).val(profile.address ? profile.address : "");
+                        $(".upload-end").empty();
+                    },
+                    error: function () {
+                        window.location.href = "/login"
+                    }
+                })
+
+            })
+        });
+
+
+        // 提交修改个人资料
+        $(function () {
+            var token = "Bearer " + localStorage.token;
+            $("#profile_submit").on("click", function () {
+                var that = this;
+
+                var person_profile = $(".personal-cont .left").find("input");
+                var username = person_profile.eq(0).val();
+                var gender = $(".personal-cont .left .sex").val();
+                var birthday = person_profile.eq(1).val();
+                var address = person_profile.eq(2).val();
+                var file = $(".upload-end img").attr("src");
+
+                $.ajax({
+                    type: "patch",
+                    url: "/userprofile/",
+                    contentType: "application/json",
+                    headers: {
+                        Authorization: token,
+                    },
+                    data: JSON.stringify({
+                        "username": username,
+                        "gender": gender,
+                        "birthday": birthday,
+                        "address": address,
+                        "file": file,
+                    }),
+                    cache: false,
+                    async: false,
+                    success: function (profile) {
+                        alert("资料更新成功");
+                        var profile_box = $(that).parents(".content").find(".nickname");
+                        profile_box.find("p").html(profile.username);
+                        profile_box.find("img").attr("src", profile.avatar);
+                    },
+                    error: function () {
+                        alert("用户名已存在，请重新填写！")
+                    }
+                })
+
+            })
+        });
+
+        // 上传店铺照
+        var pic = document.getElementById("pic");
+        console.log(pic);
+        pic.onchange = function (e) {
+            var img = document.createElement("img");
+            //获取用户上传的文件对象
+            var theFile = pic.files[0];
+            //实例化一个文件读取器
+            var fileReader = new FileReader();
+            //将用户上传的文件对象作为参数，传入文件读取器的方法readAsDataURL
+            fileReader.readAsDataURL(theFile);
+            //文件读取器方法执行完毕后调用函数
+            fileReader.onload = function () {
+                //文件读取器的result属性即fileReader.result，就是上传文件的dataURL
+                img.src = fileReader.result;
+            };
+
+            var upload_end = document.getElementsByClassName("upload-end");
+            upload_end[0].innerHTML = "";
+            upload_end[0].appendChild(img);
+
+        };
+    </script>
+
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends './particular.html' %}
+
+
+{% block content %}
+    <!-- 任务列表 -->
+    <div class="task_list" >
+                <div class="task-cont tab_cont">
+                    <ul class="tab">
+                        <li class="tab-item active">全部</li>
+                        <li class="tab-item">进行中</li>
+                        <li class="tab-item">匹配中</li>
+                        <li class="tab-item">已完成</li>
+                    </ul>
+                    <input type="text" placeholder="请输入">
+                </div>
+                <div class="products">
+                    <div class="main selected" id="main_cont_list">
+
+                    </div>
+                    <div class="main">
+
+                    </div>
+                    <div class="main">
+
+                    </div>
+                    <div class="main">
+                    </div>
+                </div>
+        </div>
+    <script>
+        $(function () {
+             $(".task_list").siblings().css("display", "none");
+            $(".task_list").css("display", "block");
+            $('#task_list img:eq(0)').css("display", "none");
+            $('#task_list img:eq(1)').css("display", "block");
+            $('#task_list div').css("color", "#427CFF");
+            $('#task_list').siblings().children("img").hide();
+            $('#task_list').siblings().children(".now").show();
+            $('#task_list').siblings().children().css("color", "#000");
+
+
+            var token = "Bearer " + localStorage.token;
+            $.ajax({
+                url: "/task",
+                contentType: "application/json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (tasks) {
+                    console.log(tasks);
+                    var ele0 = "";
+                    var ele1 = "";
+                    $("#main_cont_list").empty();
+                    $(".task_list .products .main").eq(2).empty();
+                    $(".task_list .products .main").eq(3).empty();
+                    $(".task_list .products .main").eq(1).empty();
+                    $.each(tasks, function (i, task) {
+                        ele0 = "<div class=\"main_cont\">\n" +
+                            "<div class=\"cont_introduce\">\n" +
+                            "<p>提交数据源url：" + task.url + "</p>\n" +
+                            "<p><span>数据类型：数据抓取</span><span>佣金：" + task.price + "</span></p>\n" +
+                            "<p><span>发布时间：" + task.publish_time + "</span><span>剩余时间：" + task.left_time + "</span></p>\n" +
+                            "</div>\n" +
+                            "<div class=\"cont_piay\">\n" +
+                            "<span class=\"detail_but\">明细</span>\n" +
+                            "</div>\n" + "<div style='display: none'>" + task.id + "</div>" +
+                            "</div>";
+
+                        ele1 = "<div class=\"main_cont\">\n" +
+                            "<div class=\"cont_introduce\">\n" +
+                            "<p>提交数据源url：" + task.url + "</p>\n" +
+                            "<p><span>数据类型：数据抓取</span><span>佣金：" + task.price + "</span></p>\n" +
+                            "<p><span>发布时间：" + task.publish_time + "</span><span>剩余时间：" + task.left_time + "</span></p>\n" +
+                            "</div>\n" +
+                            "<div class=\"cont_piay task_piay1\">\n" +
+                            "<span>" + task.status + "</span>\n" +
+                            "</div>\n" + "<div style='display: none'>" + task.id + "</div>" +
+                            "</div>";
+                        if (task.status !== "已付款") {
+                            $("#main_cont_list").append(ele1);
+                            if (task.status === "已接单" || "待接单") {
+                                $(".task_list .products .main").eq(2).append(ele1);
+                            }
+                            if (task.status === "已完成") {
+                                $(".task_list .products .main").eq(3).append(ele1);
+                            }
+                        } else {
+                            $("#main_cont_list").append(ele0);
+                            $(".task_list .products .main").eq(1).append(ele0);
+                        }
+                    });
+
+                    $(".detail_but").click(function () {
+                        var task_id = $(this).parent().next().text();
+                        console.log("+++++++++++++++++++++++++++++", task_id);
+                        $.ajax({
+                            url: "/task/" + task_id,
+                            contentType: "application/json",
+                            headers: {
+                                Authorization: token,
+                            },
+                            cache: false,
+                            success: function (task) {
+                                var task_nodes = task.tasknode_set;
+                                if (task.tasknode_set.length >= 1) {
+                                    let ele1 = "<tr>\n" +
+                                        "<th>节点名</th>\n" +
+                                        "<th>节点IP</th>\n" +
+                                        "<th>节点类型</th>\n" +
+                                        "<th>开始执行时间</th>\n" +
+                                        "<th>执行结果</th>\n" +
+                                        "</tr>\n";
+                                    var color_class = "";
+                                    $("#node_detail").empty();
+                                    $.each(task_nodes, function (i, tasknode) {
+                                        console.log(tasknode);
+                                        if (tasknode.status === '执行') {
+                                            color_class = "blue_dot"
+                                        } else if (tasknode.status === '失败') {
+                                            color_class = "red_dot"
+                                        } else if (tasknode.status === '成功') {
+                                            color_class = "green_dot"
+                                        }
+                                        ele1 += "<tr>\n" +
+                                            "<td>" + tasknode.node_detail.name + "</td>\n" +
+                                            "<td>" + tasknode.node_detail.ip + "</td>\n" +
+                                            "<td>" + tasknode.node_detail.category + "</td>\n" +
+                                            "<td>" + formateDate(tasknode.start_time) + "</td>\n" +
+                                            "<td><span class=\"" + color_class + "\"></span><span>" + tasknode.status + "</span></td>\n" +
+                                            "</tr>\n";
+                                    });
+                                    $("#node_detail").append(ele1);
+                                    $(".mask").show();
+                                    $(".coverList").show();
+                                }
+                                else {
+                                    alert("页面发生错误，节点未找到！");
+                                }
+
+                            }
+                        })
+                    });
+                }
+
+
+            });
+
+
+
+            $(".task_list .tab-item").click(function () {
+                $(this).addClass("active").siblings().removeClass("active");
+                $(".task_list .main").eq($(this).index()).show().siblings().hide();
+            })
+        });
+
+
+
+    </script>
+
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends './particular.html' %}
+
+
+{% block content %}
+
+    <!-- 我的钱包 -->
+    <div class="wallet">
+        <div class="tem-box">
+            <div class="store">我的钱包</div>
+        </div>
+        <div class="my_balance">
+            <p class="balance">账户余额:</p>
+            <p class="balance_quanto">0.00</p>
+            <span id="bound">未绑定?点击</span>
+            <span id="bound_container"></span>
+            <span class="recharge" id="withdraw"><a>提现</a></span>
+            <span class="recharge" id="recharge"><a>充值</a></span>
+        </div>
+        <div class="expend detail">
+            <p>我的支出: <span>0.00</span></p>
+            <div class="detail_tb">
+                <table>
+                    <tbody>
+                    <tr>
+                        <th>流水号</th>
+                        <th>支付时间</th>
+                        <th>金额</th>
+                        <th>付款状态</th>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="income detail">
+            <p>我的收入: <span>0.00</span></p>
+            <div class="detail_tb">
+                <table>
+                    <tbody>
+                    <tr>
+                        <th>节点</th>
+                        <th>时间</th>
+                        <th>收益</th>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+
+    <script>
+        $(function () {
+            $(".wallet").siblings().css("display", "none");
+            $(".wallet").css("display", "block");
+            $('#wallet img:eq(0)').css("display", "none");
+            $('#wallet img:eq(1)').css("display", "block");
+            $('#wallet div').css("color", "#427CFF");
+            $('#wallet').siblings().children("img").hide();
+            $('#wallet').siblings().children(".now").show();
+            $('#wallet').siblings().children().css("color", "#000");
+
+
+            var token = "Bearer " + localStorage.token;
+
+            // 同步请求我的支出接口
+            $.ajax({
+                url: "/payment/",
+                contentType: "application/json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    let total_cost = 0;
+                    let ele0 = "<tr>\n" +
+                        "<th>流水号</th>\n" +
+                        "<th>支付时间</th>\n" +
+                        "<th>金额</th>\n" +
+                        "<th>付款状态</th>\n" +
+                        "</tr>";
+                    $(".expend .detail_tb table tbody").empty();
+                    $(".expend .detail_tb table tbody").append(ele0);
+
+                    for (let i = 0; i < result.length; i++) {
+                        var ele = "";
+                        console.log("++++++++++++++++++++++");
+                        let pay_time = result[i].pay_at ? formateDate(result[i].pay_at) : "";
+                        ele = "<tr>\n" +
+                            "<td>" + result[i].serial_number + "</td>\n" +
+                            "<td>" + pay_time + "</td>\n" +
+                            "<td>" + result[i].amount_money + "</td>\n" +
+                            "<td>" + result[i].already_pay + "</td>\n" +
+                            "<td style=\"display: none;\">" + result[i].id + "</td>\n" +
+                            "</tr>";
+                        if (result[i].already_pay === "支付成功") {
+                            total_cost += parseFloat(result[i].amount_money);
+                        }
+
+
+                        $(".expend .detail_tb table tbody").append(ele)
+
+                    }
+                    $(".wallet .expend p span").text(Math.round(total_cost * 100) / 100);
+
+                    // 同步请求我的收入接口
+                    $.ajax({
+                        url: "/tasknode/",
+                        contentType: "application/json",
+                        headers: {
+                            Authorization: token,
+                        },
+                        async: false,
+                        cache: false,
+                        success: function (result) {
+                            let total_income = 0;
+                            let ele_0 = "<tr>\n" +
+                                "<th>节点</th>\n" +
+                                "<th>时间</th>\n" +
+                                "<th>收益</th>\n" +
+                                "</tr>";
+                            $(".income .detail_tb table tbody").empty();
+                            $(".income .detail_tb table tbody").append(ele_0);
+
+                            $.each(result, function (i, profile_tasknode) {
+                                let ele_ = "<tr>\n" +
+                                    "<td>" + profile_tasknode.node_detail.name + "</td>\n" +
+                                    "<td>" + formateDate(profile_tasknode.start_time) + "</td>\n" +
+                                    "<td>" + profile_tasknode.this_time_revenue + "</td>\n" +
+                                    "</tr>";
+
+                                total_income += parseFloat(profile_tasknode.this_time_revenue);
+                                console.log(total_income);
+                                $(".income .detail_tb table tbody").append(ele_)
+
+                            });
+
+                            $(".wallet .income p span").text(Math.round(total_income * 100) / 100);
+
+                            // 同步请求我的余额接口
+                            $.ajax({
+                                url: "/myaccount/",
+                                contentType: "application/json",
+                                headers: {
+                                    Authorization: token,
+                                },
+                                async: false,
+                                cache: false,
+                                success: function (result) {
+                                    let balance = parseFloat(result[0].balance);
+                                    console.log(result);
+                                    $(".wallet .my_balance .balance_quanto").text(Math.round(balance * 100) / 100);
+                                }
+                            })
+
+                        }
+                    })
+
+
+                }
+            })
+
+
+        });
+    </script>
+
+{% endblock %}

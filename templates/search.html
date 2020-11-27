@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="https://cdn.bootcss.com/normalize/8.0.1/normalize.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/search.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/echarts/4.4.0-rc.1/echarts.min.js"></script>
+    <link rel="stylesheet" href="../static/lib/bootstrap/css/bootstrap.min.css">
+    <script src="../static/lib/bootstrap/js/bootstrap.min.js"></script>
+
+</head>
+<style>
+    .head_input{
+        position: relative;
+    }
+    .btn{
+        position: absolute;
+        left:365px;
+        top:3px;
+        background-color: #5a5a5a;
+    }
+</style>
+<body>
+<header>
+    <div class="content">
+        <img src="../static/images/logo.png" alt="" class="logo">
+        <div class="head_input">
+            <input id="search" type="text" placeholder="{{ key_word }}">
+            <img src="../static/images/search.png" alt="" onclick="search()">
+            <button class="btn" type="button" onclick="search()">
+                                    搜索
+                                </button>
+        </div>
+        <span></span>
+    </div>
+</header>
+<div class="information">
+    <div class="content">
+        <div class="control">
+            {% for key,tag in words_intersection.items %}
+                <div class="control_cont"  id="{{ key }}">
+                    <div class="control_head">
+                        <div class="control_search">
+                            <span>{{ key_word }}</span>
+                        </div>
+                        {% with index1=forloop.counter %}
+                            <div class="control_box">
+                              <div onclick="enlarge(this,{{ index1 }})">放大</div>
+                              <div onclick="small(this,{{ index1 }})">缩小</div>
+                                {% for key2,value2 in tag.items %}
+
+                                    {% if key2 == 'LOCATION' %}
+
+                                        <div data-num="{{ index1|add:-1 }}" data-index="{{ forloop.counter|add:-1 }}"
+                                             onclick="renwu(event,legendes{{ index1 }})">地点
+                                        </div>
+                                    {% elif key2 == 'ORGANIZATION' %}
+                                        <div data-num="{{ index1|add:-1 }}" data-index="{{ forloop.counter|add:-1 }}"
+                                             onclick="renwu(event,legendes{{ index1 }})">组织
+                                        </div>
+                                    {% elif key2 == 'PERSON' %}
+                                        <div data-num="{{ index1|add:-1 }}" data-index="{{ forloop.counter|add:-1 }}"
+                                             onclick="renwu(event,legendes{{ index1 }})">人物
+                                        </div>
+                                    {% elif key2 == 'ALL' %}
+                                        <div data-num="{{ index1|add:-1 }}" data-index="{{ forloop.counter|add:-1 }}"
+                                             onclick="renwu(event,legendes{{ index1 }})">身份
+                                        </div>
+                                    {% endif %}
+
+                                {% endfor %}
+                                <div data-num="{{ index1|add:-1 }}" data-index="{{ tag|length }}"
+                                     onclick="renwu(event,legendes{{ index1 }})">全部
+                                </div>
+                            </div>
+                            </div>
+                            <div class="distribute" id="relation{{ forloop.counter }}"></div>
+                            </div>
+                        {% endwith %}
+            {% endfor %}
+        </div>
+
+        <div class="info">
+            {% for web in news_list %}
+                <div class="info_cont">
+                    <a href="{{ web.0 }}" class="info_title">{{ web.1 }}</a><br>
+                    <p class="news">{{ web.4 }}</p>
+                    <div class="info_source">
+                        <a href="{{ web.0 }}" class="origin">{{ web.0 }}</a>
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="block" id="app">
+                <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="{{ current_page }}"
+                        background
+                        layout="prev, pager, next"
+                        :total="{{ num }}">
+                </el-pagination>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+
+    localStorage.setItem('detail_selected','');
+     //放大
+        function enlarge(dom,index) {
+        let parent=$(dom).parent().parent().parent();
+           parent.siblings('.control_cont').hide();
+           parent.parent().css({ "width": "800px", "height": "800px" })
+           parent.css({ "width": "800px", "height": "800px" });
+         $(dom).parent().parent().next().css({ "width": "800px", "height": "750px" });
+         {#setInterval(draw_new(key,index),1000)#}
+            var myChart_new = list[index-1];
+            {#myChart_new.clear();#}
+            myChart_new.resize();
+    {#myChart_new.setOption(option,true);#}
+        }
+        //缩小
+    function small(dom,index){
+            let parent=$(dom).parent().parent().parent();
+            parent.siblings('.control_cont').show()
+            parent.parent().css({ "width": "550px", "height": "100%" })
+            parent.css({ "width": "550px", "height": "350px" });
+            $(dom).parent().parent().next().css({ "width": "550px", "height": "305px" });
+            myChart_new.resize();
+    }
+
+    $(function () {
+
+        //字符串修改
+        function detString(string, number) {
+            let newString = '';
+            for (let index in string) {
+                if (index < number) {
+                    newString += string[index]
+                }
+            }
+            newString += '...';
+
+            return newString
+        }
+
+        //修改news内容
+        $(".news").each(function () {
+            // console.log($(this))
+            var domeText = $(this).text();
+
+            $(this).text(detString(domeText, 60))
+        });
+
+    })
+
+</script>
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var size = 50; //节点大小
+    var list = [];
+    var legendes = [];
+
+    // 调试页面回打印出点击的节点名称
+    var Iperson = "../static/images/人物.svg";
+    var Iadds = "../static/images/地点.svg";
+    var Icompany = "../static/images/机构.svg";
+    var Iobj = "../static/images/人物.svg";
+
+    function setDataPerson(json, n) {
+        var i = 0;
+        for (var p in json) {
+            listdata.push({
+                x: 50,
+                y: 100,
+                "name": p,
+                "showName": json[p],
+                "symbol": 'image://' + Iobj,
+                "symbolSize": 70,
+                "category": n,
+                "draggable": "false",
+                formatter: function (params) {
+                    return params.data.showName
+                },
+                label: {
+                    position: 'bottom'
+                }
+            });
+            i++;
+        }
+    }
+
+    function setDataPhone(json, n) {
+        var i = 0;
+        for (var p in json) {
+            listdata.push({
+                x: i * 50,
+                y: size + i * 10,
+                "name": p,
+                "showName": json[p],
+                "symbol": 'image://' + Iperson,
+                "symbolSize": size,
+                "category": n,
+                "draggable": "false",
+                formatter: function (params) {
+                    return params.data.showName
+                },
+                label: {
+                    position: 'bottom'
+                }
+            });
+            i++;
+        }
+    }
+
+    function setDataPhone2(json, n) {
+        var i = 0;
+        for (var p in json) {
+            listdata.push({
+                x: i * 50,
+                y: size + i * 10,
+                "name": p,
+                "showName": json[p],
+                "symbol": 'image://' + Iadds,
+                "symbolSize": size,
+                "category": n,
+                "draggable": "false",
+                formatter: function (params) {
+                    return params.data.showName
+                },
+                label: {
+                    position: 'bottom'
+                }
+            });
+            i++;
+        }
+    }
+
+    function setDataCar(json, n) {
+        var i = 0;
+        for (var p in json) {
+            listdata.push({
+                x: i * 50,
+                y: size + i * 10,
+                "name": p,
+                "showName": json[p],
+                "symbol": 'image://' + Icompany,
+                "symbolSize": size,
+                "category": n,
+                "draggable": "false",
+                formatter: function (params) {
+                    return params.data.showName
+                },
+                label: {
+                    position: 'bottom'
+                }
+            });
+            i++;
+        }
+    }
+
+    function setLinkData(json, relarr, title) {
+        if (relarr !== "") {
+            var i = 0;
+            for (var p in json) {
+                links.push({
+                    "source": p,
+                    "target": title,
+                    "value": relarr[i],
+                    lineStyle: {
+                        normal: {
+                            // text: relarr[i],
+                            color: 'source'
+                        }
+                    }
+                });
+                i++;
+            }
+        } else {
+            for (var p2 in json) {
+                links.push({
+                    "source": p2,
+                    "target": title,
+                    "value": "",
+                    lineStyle: {
+                        normal: {
+                            color: 'source'
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+
+
+    $('.distribute').click(function () {
+        event.stopPropagation();
+    })
+
+
+
+    var words_intersection_len = {{ words_intersection_len|safe }};
+    var words_intersection = {{ words_intersection|safe }};
+
+    {% for key,tag in words_intersection.items %}
+        console.log('{{ key|safe }}');
+        var listdata = [];//节点数组
+        var links = [];//链接数组
+        legendes = [];
+        {% with one_index=forloop.counter %}
+        var legendes{{ one_index }} = [];
+        var myChart{{ forloop.counter }} = echarts.init(document.getElementById('relation{{ forloop.counter }}'));
+        var has_organization;
+
+        {% for key2,value2 in tag.items %}
+            {% if key2 == 'LOCATION' %}
+                var adds = {{ value2|safe }};
+                var has_location;
+                {% if value2 %}
+                    has_location = true;
+                    legendes.push('地点');
+                    legendes{{ one_index }}.push('地点');
+                {% else %}
+                    has_location = false;
+                {% endif %}
+                {#console.log({{ value2|safe }}, '////////////', has_location)#}
+
+            {% elif key2 == 'ORGANIZATION' %}
+                var company = {{ value2|safe }};
+                {% if value2 %}
+                    has_organization = true;
+                    legendes.push('组织');
+                    legendes{{ one_index }}.push('组织');
+                {% else %}
+                    has_organization = false;
+                {% endif %}
+                console.log({{ value2|safe }}, '////////////', has_organization)
+
+            {% elif key2 == 'PERSON' %}
+                var person = {{  value2|safe }}
+                var has_person;
+                {% if value2 %}
+                    has_person = true;
+                    legendes.push('人物');
+                    legendes{{ one_index }}.push('人物');
+                {% else %}
+                    has_person = false;
+                {% endif %}
+                {#console.log({{ value2|safe }}, '////////////', has_person)#}
+
+            {% elif key2 == 'ALL' %}
+                var all = {{  value2|safe }}
+                var has_all;
+                {% if value2 %}
+                    has_all = true;
+                    legendes.push('身份');
+                    legendes{{ one_index }}.push('身份');
+                {% else %}
+                    has_all = false;
+                {% endif %}
+                {#console.log({{ value2|safe }}, '////////////', has_person)#}
+
+            {% endif %}
+        {% endfor %}
+        legendes.push('{{ key_word }}');
+        legendes{{ one_index }}.push('{{ key_word }}');
+        var texts = [];//链接数组
+        for (var i = 0; i < legendes.length; i++) {
+            texts.push({
+                "name": legendes[i]
+            })
+        }
+        {#console.log(texts);#}
+        var objShip = {'{{ key_word }}': '{{ key_word}}'};
+        {#console.log(objShip, 11111);#}
+        setDataPerson(objShip, legendes.indexOf('{{ key_word }}'));
+        if (has_location) {
+            setDataPhone2(adds, legendes.indexOf('地点'));
+            var addsIMSI = words_intersection_len['{{ key|safe }}']['LOCATION_LEN'];
+            {#console.log(addsIMSI, adds, '地点', legendes, legendes.indexOf('地点'));#}
+            setLinkData(adds, addsIMSI, '{{ key_word }}');
+        }
+        if (has_organization) {
+            setDataCar(company, legendes.indexOf('组织'));
+            var companyIMSI = words_intersection_len['{{ key|safe }}']['ORGANIZATION_LEN'];
+            {#console.log(companyIMSI, company, '组织', legendes, legendes.indexOf('组织'));#}
+            setLinkData(company, companyIMSI, '{{ key_word }}');
+        }
+        if (has_person) {
+            setDataPhone(person, legendes.indexOf('人物'));
+            var personIMSI = words_intersection_len['{{ key|safe }}']['PERSON_LEN'];
+            {#console.log(personIMSI, person, '人物', legendes, legendes.indexOf('人物'));#}
+            setLinkData(person, personIMSI, '{{ key_word }}');
+        }
+        if (has_all) {
+            setDataPhone(all, legendes.indexOf('身份'));
+            var allIMSI = words_intersection_len['{{ key|safe }}']['ALL_LEN'];
+            setLinkData(all, allIMSI, '{{ key_word }}');
+        }
+        {#console.log('------------------------------------------------------------');#}
+        {#console.log(listdata);#}
+        {#console.log(links);#}
+        {#console.log(texts);#}
+
+
+        option = {
+            title: {
+                text: "人物关系",
+                top: "top",
+                left: "left",
+                textStyle: {
+                    color: '#000000'
+                }
+            },
+            tooltip: {
+                formatter: '{b}'
+            },
+
+            backgroundColor: '#f7f7f7',
+            legend: {
+                data: legendes,
+                textStyle: {
+                    color: '#000000'
+                },
+                icon: 'circle',
+                type: 'scroll',
+                orient: 'vertical',
+                left: 10,
+                top: 20,
+                bottom: 20,
+                itemWidth: 10,
+                itemHeight: 10
+            },
+            animationDuration: 100,
+            animationEasingUpdate: 'quinticInOut',
+            series: [{
+                type: 'graph',
+                layout: 'force',
+                force: {
+                    initLayout: 'circular',
+                    repulsion: 100,
+                    gravity: 0,
+                    edgeLength: 30,
+                    layoutAnimation: false,
+                },
+                data: listdata,
+                links: links,
+                categories: texts,
+                roam: true,
+                nodeScaleRatio: 0,
+                focusNodeAdjacency: true,
+
+                lineStyle: {
+                    normal: {
+                        opacity: 0.5,
+                        width: 1.5,
+                        curveness: 0
+                    }
+                },
+                label: {
+                    normal: {
+                        show: true,
+                        position: 'inside',
+                        textStyle: {
+                            color: '#000000',
+                            fontWeight: 'normal',
+                            fontSize: "12" //字体大小
+                        },
+                        formatter: function (params) {
+                            return params.data.showName
+                        },
+                        fontSize: 18,
+                        fontStyle: '600',
+                    }
+                },
+                edgeLabel: {
+                    normal: {
+                        show: true,
+                        textStyle: {
+                            fontSize: 12
+                        },
+                        formatter: "{c}"
+                    }
+                }
+            }],
+            color: ['#e8b842', '#41b1ef', '#667aed', '#ba55d3']
+        };
+
+        myChart{{ forloop.counter }}.on("click", param => {
+        {#console.log(param.name);#}
+        {#console.log(param,myChart{{ forloop.counter }}._dom);#}
+        let dom=myChart{{ forloop.counter }}._dom;
+        let id=$(dom).parent().attr('id');
+        let name=param.name;
+        let data=[];
+        console.log(id)
+        data.push(id);
+        data.push(name);
+        localStorage.setItem('detail_selected',JSON.stringify(data));
+        $.ajax({
+                      type: 'POST',
+                      url: "/search_result_selected_detail/",
+                      data: { detail_selected: localStorage.getItem("detail_selected"),key_word:'{{ key_word }}' ,words_intersection:JSON.stringify(words_intersection),words_intersection_len:JSON.stringify(words_intersection_len),task_id:{{ task_id }},page:`1` },
+                      success: function (data) {
+                            $('.info').html(data)
+                      },
+                    });
+
+
+        if (param.dataType == "edge") {
+            myChart.dispatchAction({
+                type: 'unfocusNodeAdjacency',
+                seriesIndex: 0
+            });
+        }
+    });
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart{{ forloop.counter }}.setOption(option);
+         list.push(myChart{{ forloop.counter }});
+        {% endwith %}
+
+
+    {% endfor %}
+    function renwu(event,legendes) {
+        {#console.log(event.target.dataset.index)#}
+        {#console.log(event.target.dataset)#}
+        var Chart='';
+        let index = event.target.dataset.index
+        let num = event.target.dataset.num;
+        let dom = event.target;
+        $(dom).css("background", '#53afff');
+        $(dom).siblings().css("background", '#161d28');
+        event.stopPropagation();
+        {#console.log(legendes, '=================')#}
+        {#console.log(list);#}
+        {#console.log(num);#}
+        Chart= list[num];
+    {#console.log(list,num)#}
+    {#console.log(Chart)#}
+
+        if (index == legendes.length-1) {
+            for (let i in legendes) {
+
+                Chart.dispatchAction({
+                    type: 'legendSelect',
+                    // 图例名称
+                    name: legendes[i]
+                })
+            }
+        } else {
+            for (let j in legendes) {
+                if (j == index) {
+                    {#console.log(j, index, legendes[j],Chart)#}
+                    Chart.dispatchAction({
+                        type: 'legendSelect',
+                        // 图例名称
+                        name: legendes[j]
+                    })
+                } else {
+                    Chart.dispatchAction({
+                        type: 'legendUnSelect',
+                        // 图例名称.target.dataset
+                        name: legendes[j]
+                    })
+                }
+            }
+            Chart.dispatchAction({
+                type: 'legendSelect',
+                // 图例名称
+                name: '{{ key_word }}'
+            })
+        }
+    }
+     {#```````````````````````````````````````````#}
+     var selected_list;
+          {#console.log(localStorage.getItem("selected_list"),1111111111111)#}
+        if (localStorage.getItem("selected_list")) {
+              selected_list=JSON.parse(localStorage.getItem("selected_list"));
+                  {#console.log(typeof selected_list)#}
+              for (let i in selected_list ){
+                  let id=selected_list[i];
+                  {#console.log(typeof  id)#}
+                  let div=document.getElementById(id)
+
+                   $(div).addClass("active")
+
+              }
+        }else{
+            selected_list=[]
+        }
+        function isNotNull(ele){
+  if(typeof ele==='undefined'){//先判断类型
+    return false;
+  }else if(ele==null){
+    return false;
+  }else if(ele==''){
+    return false;
+  }else if(ele=='[]'){
+    return false;
+  }
+  return true;
+}
+  {#console.log(selected_list,22222222222222222222222)#}
+    //点击出现蓝色的框框
+    $(".control_cont").click(function () {
+        localStorage.setItem('detail_selected','');
+        let id=$(this).attr('id');
+        if ($(this).hasClass("active")) {
+            $(this).removeClass("active");
+            selected_list.splice($.inArray(id,selected_list),1);
+        } else {
+            $(this).addClass("active");
+            selected_list.push(id)
+        }
+        localStorage.setItem('selected_list',JSON.stringify(selected_list));
+        console.log(localStorage.getItem("selected_list"))
+        var task_id = {{ task_id }};
+        var key_word = '{{ key_word }}';
+        console.log(task_id);
+        if(isNotNull(localStorage.getItem("selected_list"))){
+            console.log('into /search_result/');
+            $.ajax({
+              type: 'POST',
+              url: "/search_result_selected/",
+              data: { selected_list: localStorage.getItem("selected_list"),key_word:key_word ,words_intersection:JSON.stringify(words_intersection),words_intersection_len:JSON.stringify(words_intersection_len),task_id:task_id,page:1},
+              success: function (data) {
+                  {#console.log(data);#}
+                  {#window.location.href = `/search_result/?key={{ key_word }}&page=1`;#}
+                    $('.info').html(data)
+              },
+            });
+        }
+        else {
+            location.reload()
+        }
+
+
+    });
+</script>
+
+<!-- 引入样式 -->
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<!-- 引入组件库 -->
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui@2.13.0/lib/index.js"></script>
+<script>
+
+     var app = new Vue({
+        el: '#app',
+        data() {
+            return {visible: false}
+        },
+        methods: {
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
+            handleCurrentChange(val) {
+                var selected_list = localStorage.getItem("selected_list");
+                var detail_selected =localStorage.getItem("detail_selected");
+                var num ={{ num }};
+                if(isNotNull(detail_selected)){
+                    console.log('detail_selected')
+                    $.ajax({
+                      type: 'POST',
+                      url: "/search_result_selected_detail/",
+                      data: { detail_selected: localStorage.getItem("detail_selected"),key_word:'{{ key_word }}' ,words_intersection:JSON.stringify(words_intersection),words_intersection_len:JSON.stringify(words_intersection_len),task_id:{{ task_id }},page:`${val}` },
+                      success: function (data) {
+                          {#console.log(data);#}
+                          {#window.location.href = `/search_result/?key={{ key_word }}&page=1`;#}
+                            $('.info').html(data)
+                      },
+                    });
+                }else if(isNotNull(selected_list)){
+                    console.log('selected_list')
+                    $.ajax({
+                      type: 'POST',
+                      url: "/search_result_selected/",
+                      data: { selected_list: localStorage.getItem("selected_list"),key_word:'{{ key_word }}' ,words_intersection:JSON.stringify(words_intersection),words_intersection_len:JSON.stringify(words_intersection_len),task_id:{{ task_id }},page:`${val}`},
+                      success: function (data) {
+                          {#console.log(data);#}
+                          {#window.location.href = `/search_result/?key={{ key_word }}&page=1`;#}
+                            $('.info').html(data)
+                      },
+                    });
+                }else{
+                    console.log(`当前页: ${val}`);
+                    window.location.href = `/search_result/?key={{ key_word }}&page=${val}`+'&token='+localStorage.token;
+                }
+
+            }
+        }
+    })
+     function search() {
+        var input_data = document.getElementById("search").value;
+        window.location.href = '/search_result/?key='+encodeURI(input_data)+'&token='+localStorage.token
+    }
+</script>
+</html>

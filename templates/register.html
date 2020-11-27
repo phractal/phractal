@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <title>注册</title>
+</head>
+
+<style>
+    html{
+        background-color: rgb(31,39,49);
+    }
+    h1,
+    p {
+        margin: 0;
+    }
+
+    a {
+        text-decoration: none;
+       color: #53afff;
+    }
+
+    .container {
+        width: 500px;
+        margin: 180px auto;
+        text-align: center;
+    }
+
+     .logo_icon img{
+        	width: 150px;
+	height: 40px;
+        margin-bottom: 10px;
+        {#font-size: 50px;#}
+        {#color: #40BDE4;#}
+    }
+
+    .container .text {
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 14px;
+    }
+
+    .container .logon {
+        width: 375px;
+        display: flex;
+        justify-content: space-between;
+        margin: 0 auto;
+        padding-top: 41px;
+    }
+
+    .container .logon-left {
+        font-weight: bold;
+        font-size: 16px;
+    }
+ .container .logon-left a{
+     color: #ffffff;
+ }
+    .container .logon-right {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .container .input {
+        text-align: left;
+        position: relative;
+
+    }
+input{
+    	color: #ffffff;
+}
+    .container .input input {
+        height: 38px;
+        border-radius: 5px;
+        border: none;
+        font-size: 16px;
+        line-height: 40px;
+        margin: 24px 0 0 60px;
+        outline: none;
+        background-color: #000000;
+
+    }
+
+    .container input::-webkit-input-placeholder {
+        color: #E5E5E5;
+        border: 0;
+    }
+
+    .container .email,
+    .container .confirm-password {
+        text-indent: 12px;
+        width: 378px;
+    }
+
+    .container .password {
+        text-indent: 12px;
+        width: 300px;
+    }
+
+    .container .input .phone {
+        text-indent: 12px;
+        width: 378px;
+        height: 40px;
+        margin: 24px 0 0 60px;
+        border-radius: 5px;
+        overflow: hidden;
+        border:none;
+        display: flex;
+        justify-content: flex-start;
+        background-color: #000000;
+    }
+
+    .container .input .phone select {
+        text-indent: 12px;
+        width: 72px;
+        height: 44px;
+        color: #E5E5E5;
+        border: none;
+        position: relative;
+        bottom: 2px;
+        border-left: 0;
+        outline: none;
+        background-color: #000000;
+    }
+
+    .container .input .phone .cell {
+        text-indent: 12px;
+        width: 300px;
+        margin: 0;
+        border-radius: 0;
+        border: 0
+    }
+
+    .container .input .verify-code {
+        margin-top: 24px;
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .container .input .verify-code .verify {
+        width: 270px;
+        margin-top: 0;
+        text-indent: 12px;
+    }
+
+    .container .input .verify-code .code {
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 40px;
+        margin-left: 24px;
+        color: #53afff;
+    }
+
+    .container .input .enroll {
+        width: 176px;
+        background-color: #53afff;
+        color: #ffffff;
+        position: absolute;
+        left: calc(50% - 88px);
+        margin: 24px 0 0 0;
+    }
+      .cloud{
+        font-size: 14px;
+        position: fixed;
+        bottom: 20px;
+        left: calc(50% - 170px);
+        color: #545454;
+    }
+</style>
+
+<body>
+<div class="container">
+      <div class="logo_icon"> <img src="/static/images/logo—icon.png" alt=""></div>
+    <div class="text">是东半球最具影响力的数据抓取任务发布平台</div>
+    <div class="logon">
+        <div class="logon-left"> &nbsp;
+            <a id="res_way_p" class="region" href="#phone">注册</a>
+        </div>
+        <div class="logon-right"><a href="/login">使用已有帐户登录</a></div>
+    </div>
+    <div class="input">
+        <div id="email">
+            <input type="text" name="username" placeholder="邮箱/用户名" class="email"><br>
+            <input type="text" name="password" placeholder="6 - 16 位密码，区分大小写" class="password"><br>
+            <input type="text" name="verify_password" placeholder="确认密码" class="confirm-password"><br>
+
+        </div>
+        <div id="phone">
+            <div class="phone">
+                <select name="" id="">
+                    <option value="">+86</option>
+                    <option value="">+11</option>
+                </select>
+                <input type="text" placeholder="11 位手机号" class="cell">
+            </div>
+            <div class="verify-code">
+                <input type="text" placeholder="输入验证码" class="verify"><br>
+                <div class="code">获取验证码</div>
+            </div>
+
+{#            <input type="submit" value="注册" class="enroll" id="submit_phone">#}
+        </div>
+         <input type="submit" value="注册" class="enroll" id="submit_email">
+        <div class="cloud">©2019黑云科技 隐私政策 服务条款 京ICP证080268号</div>
+    </div>
+</div>
+</body>
+
+
+<script type="text/javascript">
+
+    // 显示手机注册和普通注册
+    $(function () {
+        $(".region").click(function () {
+            let reg = $(this);
+            let txt = reg.text();
+            if (txt === "手机注册") {
+                $("#email").hide();
+                $("#phone").show();
+                reg.text('邮箱注册')
+            } else {
+                $("#email").show();
+                $("#phone").hide();
+                reg.text("手机注册")
+            }
+        })
+    });
+
+
+    // 手机注册
+    $(function () {
+        $(".code").click(function () {
+            var phone_num = $(".cell").val();
+            if (!isMobile(phone_num)) {
+                alert("手机号码格式错误， 请重新输入")
+            } else {
+                settime(this);
+                $.post("/phonecode/", {"mobile": jQuery.trim(phone_num)}, function (msg) {
+                    console.log(msg);
+                    if (msg.status === 201) {
+                        alert("验证码发送成功，请查看手机")
+                    } else {
+                        alert("验证码发送失败，请稍后获取")
+                    }
+                })
+            }
+        })
+    });
+
+
+    //手机号码验证
+    function isMobile(s) {
+        var reg = /^1[3-9][0-9]{9}$/;
+        if (!reg.exec(s)) {
+            return false;
+        }
+        return true;
+
+    }
+
+    // 重新发送倒计时
+    var countdown = 60;
+
+    function settime(obj) {
+        if (countdown === 0) {
+            $(obj).removeAttr("disabled", "color");
+            $(obj).text("获取验证码");
+            countdown = 60;
+            return;
+        } else {
+            $(obj).attr("disabled", true);
+            $(obj).text(countdown + 's' + '后重发');
+            countdown--;
+        }
+        setTimeout(function () {
+            settime(obj)
+        }, 1000)
+    }
+
+
+
+
+
+
+
+    // 手机验证码注册
+    $(function () {
+        $("#submit_phone").click(function () {
+            var phone_num = $(".cell").val();
+            var verify_code = $(".verify").val();
+            $.ajax({
+                type: "POST",
+                url: "/register/phone/",
+                data: JSON.stringify({"mobile": phone_num, "verify_code": verify_code, "username": phone_num}),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (result) {
+                    localStorage.token = result.token.access;
+                    window.location.href = "/particular"
+                },
+                error: function (result) {
+                    var data = result.responseJSON.verify_code;
+                    if (data !== "undefined") {
+                        if (data[0] === "验证码过期") {
+                            alert("验证码过期")
+                        }
+                        if (data[0] === "验证码错误") {
+                            alert("验证码错误")
+                        }
+                        if (data[0] === "验证码无效") {
+                            alert("验证码无效")
+                        }
+                    } else {
+                        alert("该手机号已经被注册，请确认后进行注册！！！")
+                    }
+
+                }
+            })
+        })
+    });
+
+    // 邮箱或者用户名注册
+    $(function () {
+        $("#submit_email").click(function () {
+            var username = $(".email").val();
+            var password = $(".password").val();
+            var password1 = $(".confirm-password").val();
+            console.log(username);
+            console.log(password);
+            if (password !== password1) {
+                alert("密码输入不一致，请重新输入！！！");
+                return
+            }
+            $.ajax({
+                type: "POST",
+                url: "/register/simple/",
+                data: JSON.stringify({"username": username, "password": password}),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (result) {
+                    window.location.href = "/login"
+                },
+                error: function (result) {
+                    if (result.status === 400) {
+                        alert("该邮箱或用户名已经被注册，请重新填写！")
+                    }
+                    if (result.status === 403) {
+                        alert("未知错误！")
+                    }
+                    {#window.location.href = "/register"#}
+                }
+
+            })
+        })
+
+    });
+
+
+</script>
+</html>

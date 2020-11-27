@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>首页</title>
+    <link href="https://cdn.bootcss.com/normalize/8.0.1/normalize.css" rel="stylesheet">
+    <style>
+       html,
+        body,
+        #container {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .info {
+            background: #5B667C;
+            color: #ffffff;
+            padding: 10px;
+            max-width: 300px;
+            min-width: 200px;
+            font-size: 12px;
+            border-radius: 10px;
+            opacity: 0.9;
+        }
+
+        .info tr .content {
+            text-align: right;
+            color: #D3D8E0;
+            max-width: 200px;
+        }
+
+        .navigation {
+            width: 670px;
+            height: 50px;
+            background-color: #35383D;
+            border-radius: 4px;
+            opacity: 0.9;
+            position: fixed;
+            top:calc(36% - 25px);
+            left: calc(50% - 335px);
+            /* overflow: hidden; */
+        }
+      
+
+        .navigation  input {
+            width: 666px;
+            height: 50px;
+            background-color: #000000;
+            border-radius: 4px;
+            border: 0;
+            color: #ffffff;
+            padding-left: 10px;
+            z-index: 10;
+            color: #53afff;
+        }
+
+        .navigation .search {
+            position: absolute;
+            top: 16px;
+            right: 14px;
+            z-index: 20;
+        }
+        .navigation  .logo{
+            width: 150px;
+	height: 40px;
+            position: absolute;
+            top: -80px;
+           left: 258px;
+            z-index: 20;
+        }
+     .login{
+         position: fixed;
+         top: 20px;
+         right: 60px;
+         font-size: 14px;
+         color:#afafaf ;
+         z-index: 100;
+     }
+
+    </style>
+</head>
+<body>
+    <div id="container" class="container">
+    </div>
+    <div class="login"><a href="/login" style="color: #afafaf">登录</a></div>
+    <div class="navigation">
+                <input type="text" placeholder="输入关键词" />
+                <img class="search" src="../static/img/icon_serch.svg" alt="">
+                <img class="logo" src="../static/img/logo.png" alt="">
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://webapi.amap.com/maps?v=1.4.15&key=2fc86465389b2280e591ab79d33db7dd"></script>
+    <script src="//webapi.amap.com/loca?v=1.3.2&key=2fc86465389b2280e591ab79d33db7dd"></script>
+    <!-- 地图自定义显示封装 -->
+    <script src="../static/js/tip.js"></script>
+    <!-- //数据 -->
+    <script src="//a.amap.com/Loca/static/mock/districts.js"></script>
+
+    <script>
+        var map = new AMap.Map('container', {
+            mapStyle: 'amap://styles/298d2770f47692c9abc1b4602f7869c7',
+            zoom: 1,
+            center: [107.4976, 32.1697],
+            features: ['bg', 'road'],
+            viewMode: '3D',
+        });
+
+        var layer = new Loca.PointLayer({
+            eventSupport: true,
+            map: map
+        });
+
+        layer.on('mousemove', function (ev) {
+            // 事件类型
+            var type = ev.type;
+            // 当前元素的原始数据
+            var rawData = ev.rawData;
+            // 原始鼠标事件
+            var originalEvent = ev.originalEvent;
+
+            openInfoWin(map, originalEvent, {
+                '节点IP': rawData.name,
+                '经纬度': rawData.center,
+                '节点连接时间': rawData.center,
+                '节点完成任务量': rawData.center,
+            });
+        });
+
+        layer.on('mouseleave', function (ev) {
+            closeInfoWin();
+        });
+
+        layer.setData(districts, {
+            lnglat: 'center'
+        })
+        layer.setOptions({
+            style: {
+                radius: 4,
+                color: '#4fc2ff',
+                borderColor: '#ffffff',
+                borderWidth: 1.5,
+                opacity: 0.8
+            },
+            selectStyle: {
+                radius: 6,
+                color: '#ffe30a'
+            }
+        })
+
+        layer.render();
+        
+    </script>
+</body>
+
+</html>

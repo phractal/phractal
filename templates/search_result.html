@@ -1,0 +1,75 @@
+
+
+    {% for web in news_list %}
+        <div class="info_cont">
+            <a href="#" class="info_title">{{ web.1 }}</a><br>
+            <p class="news">{{ web.4 }}</p>
+            <div class="info_source">
+                <a href="{{ web.0 }}" class="origin">{{ web.0 }}</a>
+                {#                        <div>原创度：<span>95%</span></div>#}
+                {#                        <div>查看全部</div>#}
+            </div>
+        </div>
+    {% endfor %}
+
+
+
+    <div class="block" id="app">
+        <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="{{ current_page }}"
+                background
+                layout="prev, pager, next"
+                :total="{{ num }}">
+        </el-pagination>
+    </div>
+<script>
+
+      var app = new Vue({
+        el: '#app',
+        data() {
+            return {visible: false}
+        },
+        methods: {
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
+            handleCurrentChange(val) {
+                var selected_list = localStorage.getItem("selected_list");
+                var detail_selected =localStorage.getItem("detail_selected");
+                var num ={{ num }};
+                if(isNotNull(detail_selected)){
+                    console.log('detail_selected')
+                    $.ajax({client_search
+                      type: 'POST',
+                      url: "/search_result_selected_detail/",
+                      data: { detail_selected: localStorage.getItem("detail_selected"),key_word:'{{ key_word }}' ,words_intersection:JSON.stringify(words_intersection),words_intersection_len:JSON.stringify(words_intersection_len),task_id:{{ task_id }},page:`${val}` },
+                      success: function (data) {
+                          {#console.log(data);#}
+                          {#window.location.href = `/search_result/?key={{ key_word }}&page=1`;#}
+                            $('.info').html(data)
+                      },
+                    });
+                }else if(isNotNull(selected_list)){
+                    console.log('selected_list')
+                    $.ajax({
+                      type: 'POST',
+                      url: "/search_result_selected/",
+                      data: { selected_list: localStorage.getItem("selected_list"),key_word:'{{ key_word }}' ,words_intersection:JSON.stringify(words_intersection),words_intersection_len:JSON.stringify(words_intersection_len),task_id:{{ task_id }},page:`${val}`},
+                      success: function (data) {
+                          {#console.log(data);#}
+                          {#window.location.href = `/search_result/?key={{ key_word }}&page=1`;#}
+                            $('.info').html(data)
+                      },
+                    });
+                }else{
+                    console.log(`当前页: ${val}`);
+                    window.location.href = `/search_result/?key={{ key_word }}&page=${val}`;
+                }
+
+            }
+        }
+    })
+</script>
+

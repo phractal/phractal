@@ -1,0 +1,1019 @@
+{% extends './particular.html' %}
+
+
+{% block content %}
+    <link rel="stylesheet" href="../static/lib/bootstrap-table/bootstrap-table.min.css">
+    <script src="../static/lib/bootstrap-table/bootstrap-table.min.js"></script>
+    <script src="../static/lib/bootstrap-table/bootstrap-table-zh-CN.min.js"></script>
+
+
+    <style>
+        /* 模态框居中样式 */
+        .bootbox-container {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1049;
+            overflow-y: auto;
+        }
+
+        .bootbox-container:empty {
+            position: static;
+        }
+
+        .modal {
+            display: table;
+            width: 440px;
+            height: 60%;
+            margin: 0 auto;
+        }
+
+        .modal-dialog {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        /* //模态框居中样式 */
+
+        #numInputModal .modal-footer {
+            border-top: none;
+            margin-top: 15px;
+        }
+
+        #numInputModal .modal-footer .btn {
+            width: 110px;
+            margin-right: 58px;
+        }
+
+        .modal-header {
+            border-bottom: none;
+        }
+
+        #infoModal .info-img {
+            width: 100px;
+            height: 100px;
+        }
+
+        #infoModal .info-msg {
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .confirmSaveMem,.confirmSaveCpu {
+            display: inline-block;
+            line-height: 27px;
+            height: 27px;
+            font-size: 12px;
+            color: #fff;
+            background: #53afff;
+            padding: 0 4px;
+            text-align: center;
+            margin-left: 60px;
+            box-sizing: content-box;
+            {#margin-top: 30px;#}
+            border-radius: 2px;
+            cursor: pointer;
+        }
+    </style>
+
+    <!--我的节点-->
+
+    <ul id="myTab" class="nav nav-tabs">
+        <li class="active"><a href="#node_1" data-toggle="tab">节点数量管理</a></li>
+        <li><a href="#node_2" data-toggle="tab">节点运行管理</a></li>
+        <li><a href="#node_3" data-toggle="tab">系统资源分配</a></li>
+    </ul>
+
+    <div id="myTabContent" class="tab-content">
+        <!--节点数量管理-->
+        <div class="tab-pane fade  in active" id="node_1">
+
+            {#                    <div id="toolbar_1" class="btn-group">#}
+            {#                        <button id="btn_add" type="button" class="btn btn-default">#}
+            {#                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增#}
+            {#                        </button>#}
+            {#                        <button id="btn_edit" type="button" class="btn btn-default">#}
+            {#                            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>修改#}
+            {#                        </button>#}
+            {#                        <button id="btn_delete" type="button" class="btn btn-default">#}
+            {#                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>删除#}
+            {#                        </button>#}
+            {#                    </div>#}
+
+            <table class="table" id="node_table_1"></table>
+
+        </div>
+
+        <!--节点运行管理-->
+        <div class="tab-pane fade" id="node_2">
+            <table class="table" id="node_table_2"></table>
+
+        </div>
+        <!--系统资源分配-->
+        <div class="tab-pane fade" id="node_3">
+            <div>
+                <span>最大CPU利用率(%)</span>
+                <input name="employ" type="text">
+                <span class="confirmSaveCpu">确认保存</span>
+            </div>
+            <div>
+                <span>最大内存利用率(%)</span>
+                <input name="employ" type="text">
+                <span class="confirmSaveMem">确认保存</span>
+
+            </div>
+        </div>
+        <!--第二个模态框的ID为myModal_2-->
+        <div class="modal fade" id="infoModal" tabindex="-999" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true" style="display: none">
+            <div class="modal-dialog node-dialog-1">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-hidden="true">×
+                        </button>
+                    </div>
+                    <div class="modal-body" style="width: 550px; margin: 0px auto;text-align: center">
+                        <img src="" class="info-img">
+                        <div class="info-msg"></div>
+                    </div>
+                </div>
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        <!--数量输入对话框-->
+        <div class="modal fade" id="numInputModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true" style="display: none">
+            <div class="modal-dialog num-manage">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="myModalLabel" style="text-align: center"></h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="num" class="col-sm-offset-1 col-sm-2 control-label">数量</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="num" placeholder="请输入数量">
+                            </div>
+                        </div>
+                        <a href="javascript:" id="op_all"></a>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-info" id="submit">提交更改</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+
+
+            <div class="modal-dialog run-manage" style="display: none">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="myModalLabel" style="text-align: center"></h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="num" class="col-sm-offset-1 col-sm-2 control-label">数量</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="num" placeholder="请输入数量">
+                            </div>
+                            <a href="javascript:" id="op_all"></a>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-info" id="submit">提交更改</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div>
+    </div>
+
+
+    <script>
+        // 我的节点
+        $(function () {
+            $(".node").siblings().css("display", "none");
+            $(".node").css("display", "block");
+            $('#node img:eq(0)').css("display", "none");
+            $('#node img:eq(1)').css("display", "block");
+            $('#node div').css("color", "#53afff");
+            $('#node').siblings().children("img").hide();
+            $('#node').siblings().children(".now").show();
+            $('#node').siblings().children().css("color", "#fafafa");
+
+            $(function () {
+                let token = "Bearer " + localStorage.token;
+                let htmlList = `
+             <tr>
+                <th><input type="checkbox" name="checkbox" id="checks"></th>
+                <th>名称/ID</th>
+                <th>类型</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+
+            `
+                $.ajax({
+                    url: "/node/",
+                    contentType: "application/json",
+                    headers: {
+                        Authorization: token,
+                    },
+                    Type: 'GET',
+                    async: false,
+                    cache: false,
+                    success: function (nodes) {
+                        console.log(nodes)
+                        var html = htmlList;
+
+                        $("#flower").empty();
+                        nodes.forEach(function (v, i) {
+                            console.log(v)
+                            console.log(i)
+                            html += `<tr class="ontd">
+                            <td><input  type="checkbox"  data-id='${v.node_id}' name="checks" id=""></td>
+                            <td>${v.name}</td>
+                            <td>${v.node_id}</td>
+                            <td>${v.state}</td>
+                            <td>
+                                <span onclick="Add()">拷贝</span>
+                                <span  data-id='${v.node_id}' class="del">删除</span>
+                                <span  data-id='${v.node_id}'  class="open">开启</span>
+                                <span  data-id='${v.node_id}' class="close">关闭</span>
+                            </td>
+                        </tr>`
+                        })
+                        //数据追加到html
+                        $("#flower").append(html)
+
+
+                    },
+                    fail: function (er) {
+                        console.log(er)
+
+                    }
+                })
+            });
+
+
+        });
+
+        //节点
+        $(".node_price li span").click(function () {
+            var parent = $(this).parent();
+            var a = parent.children().eq(0).text();
+            var b = parent.children().eq(1).val();
+            var c = parent.children().eq(2).text();
+            parent.siblings().children().eq(1).val("");
+            if (!b) {
+                alert("请填数值!!");
+                return
+            }
+            var text = a + b + c;
+            parent.parent().parent().children("span").eq(0).text(text)
+        });
+
+
+        //新建节点
+        function newNode() {
+            $('.newNode').toggle();
+            var token = "Bearer " + localStorage.token;
+            $.ajax({
+                url: "/nodetype/",
+                type: "GET",
+                contentType: "application/json",
+                dataType: "json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    $('select[name="fuck"]').empty()
+                    let html;
+
+                    for (v in result) {
+                        html += `
+                    <option value="${result[v]}">${result[v]}</option>
+                `
+                    }
+
+
+                    //result.foreach(function (v, i) {
+                    //html += `
+                    // <option value="${v}">${v}</option>
+                    //`
+                    //});
+                    $('select[name="fuck"]').append(html);
+                    {#location.reload()#}
+                },
+                error: function (result) {
+                    console.log(result)
+
+                }
+            })
+        }
+
+        function confirm() {
+            var val = $('#inp').val()
+            let yes = $('select[name="fuck"]').val()
+            var token = "Bearer " + localStorage.token;
+            console.log(val, yes)
+            let data = {
+                "operate": "create",
+                "node_type": yes,
+                "num": val
+            }
+            console.log(data)
+            $.ajax({
+                url: "/create_node/",
+                type: "post",
+                data: JSON.stringify({
+                    "operate": "create",
+                    "node_type": yes,
+                    "num": val
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    location.reload()
+
+
+                },
+                error: function (result) {
+                    console.log(result)
+
+                }
+            })
+        }
+
+        var txt = $(".ontd").html();
+
+        function Add() {
+            $(".cont_aa").append("<tr>" + txt + "</tr>");
+        }
+
+        //开启一个
+
+        $("#flower").on("click", "span.open", function (event) {
+            var target = $(event.target);
+            let id = target.data('id')
+            var token = "Bearer " + localStorage.token;
+            let nn = {
+                "node_id": id
+            }
+            let node_list = []
+            node_list.push(nn)
+            let data = {
+                "operate": "open",
+                "nodes": node_list
+            }
+            console.log(data)
+            $.ajax({
+                url: "/node_operate/",
+                type: "post",
+                data: JSON.stringify({
+                    data
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    location.reload()
+                },
+                error: function (result) {
+                    console.log(result)
+
+                }
+            })
+        })
+
+        //开启所有
+        function openAll() {
+            let node_list = []
+            var token = "Bearer " + localStorage.token;
+            $("input[name='checks']").each(function (i, v) {
+                $(this).prop("checked");
+                $(this).data("id");
+                let list = []
+                if ($(this).prop("checked")) {
+                    let nn = {
+                        "node_id": $(this).data("id")
+                    }
+                    node_list.push(nn)
+                    list.push($(this).data("id"))
+                }
+
+            });
+            let data = {
+                "operate": "open",
+                "nodes": node_list
+            }
+            console.log(data)
+            $.ajax({
+                url: "/node_operate/",
+                type: "post",
+                data: JSON.stringify({
+                    data
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    location.reload()
+                },
+                error: function (result) {
+                    console.log(result)
+
+                }
+            })
+        }
+
+        //全选
+        $("#flower").on("click", "input#checks", function (event) {
+            var target = $(event.target);
+            let checked = target.prop("checked");
+            if (checked) {
+                $("input[name='checks']").each(function (i, v) {
+                    $(this).prop("checked", true);
+                });
+            } else {
+                $("input[name='checks']").each(function (i, v) {
+                    $(this).prop("checked", false);
+                });
+            }
+        })
+
+        function allChose(event) {
+            console.log($('#checks').prop('checked'))
+
+        }
+
+        //关闭一个
+        $("#flower").on("click", "span.close", function (event) {
+            console.log(event.target)
+            var target = $(event.target);
+            let id = target.data('id')
+            var token = "Bearer " + localStorage.token;
+            let nn = {
+                "node_id": id
+            }
+            let node_list = []
+            node_list.push(nn)
+            let data = {
+                "operate": "close",
+                "nodes": node_list
+            }
+            console.log(data)
+            $.ajax({
+                url: "/node_operate/",
+                type: "post",
+                data: JSON.stringify({
+                    data
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    location.reload()
+                },
+                error: function (result) {
+                    console.log(result)
+
+                }
+            })
+        })
+
+        //关闭全部
+        function closeAll() {
+            let node_list = []
+            var token = "Bearer " + localStorage.token;
+            $("input[name='checks']").each(function (i, v) {
+                $(this).prop("checked");
+                $(this).data("id");
+                let list = []
+                if ($(this).prop("checked")) {
+                    let nn = {
+                        "node_id": $(this).data("id")
+                    }
+                    node_list.push(nn)
+                    list.push($(this).data("id"))
+                }
+
+            });
+            let data = {
+                "operate": "close",
+                "nodes": node_list
+            }
+            console.log(data)
+            $.ajax({
+                url: "/node_operate/",
+                type: "post",
+                data: JSON.stringify({
+                    data
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    location.reload()
+                },
+                error: function (result) {
+                    console.log(result)
+
+                }
+            })
+        }
+
+        //删除
+
+        $("#flower").on("click", "span.del", function (event) {
+            console.log(event.target);
+            var target = $(event.target);
+            let id = target.data('id');
+            var token = "Bearer " + localStorage.token;
+            let nn = {
+                "node_id": id
+            }
+            let node_list = [];
+            node_list.push(nn);
+            let data = {
+                "operate": "delete",
+                "nodes": node_list
+            }
+            console.log(data);
+            $.ajax({
+                url: "/node_operate/",
+                type: "post",
+                data: JSON.stringify({
+                    data
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (result) {
+                    console.log(result);
+                    location.reload()
+                },
+                error: function (result) {
+                    console.log(result)
+
+                }
+            })
+        })
+
+
+    </script>
+    <!--节点数量管理脚本-->
+    <script>
+
+        op = '';
+        node_type = '';
+        free_space = '';
+        var token = "Bearer " + localStorage.token;
+        //节点数量管理表初始化
+        var TableInit = function () {
+            var oTableInit = {};
+            //初始化Table
+            oTableInit.Init = function () {
+                $('#node_table_1').bootstrapTable({
+                    url: '/node_num_manage',         //请求后台的URL（*）
+                    method: 'get',                      //请求方式（*）
+                    toolbar: '#toolbar_1',                //工具按钮用哪个容器
+                    striped: true,                      //是否显示行间隔色
+                    cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                    pagination: true,                   //是否显示分页（*）
+                    sortable: false,                     //是否启用排序
+                    sortOrder: "asc",                   //排序方式
+                    queryParams: oTableInit.queryParams,//传递参数（*）
+                    sidePagination: "client",           //分页方式：client客户端分页，server服务端分页（*）
+                    pageNumber: 1,                       //初始化加载第一页，默认第一页
+                    pageSize: 10,                       //每页的记录行数（*）
+                    pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                    search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                    strictSearch: false,                //启用严格搜索
+                    showColumns: true,                  //是否显示所有的列
+                    showRefresh: true,                  //是否显示刷新按钮
+                    minimumCountColumns: 2,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+                    height: 500,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                    uniqueId: "node_type",                     //每一行的唯一标识，一般为主键列
+                    showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                    cardView: false,                    //是否显示详细视图
+                    detailView: false,                   //是否显示父子表
+                    columns: [{
+                        field: 'node_type',
+                        title: '节点类型',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'num',
+                        title: '总节点数',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'occ_space',
+                        title: '占用总空间',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'free_space',
+                        title: '所在磁盘剩余空间',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'operate',
+                        title: '操作',
+                        align: "center",
+                        valign: "middle",
+                        events: operateEvents_1,
+                        formatter: AddFunctionAlty,
+                    }]
+                });
+            };
+
+            //得到查询的参数
+            oTableInit.queryParams = function (params) {
+                var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                    limit: params.limit,   //页面大小
+                    offset: params.offset,  //页码
+                };
+                return temp;
+            };
+            return oTableInit;
+        };
+
+
+        function AddFunctionAlty(value, row, index) {
+            //return ['<a id=“add_node” href="javascript:;">添加节点</a>',
+            //        '<a id=“del_node” href="javascript:;">删除节点</a>'
+            //]
+            return ['<a class=add_node href="javascript:;">添加节点</a>&nbsp&nbsp',
+                '<a class=del_node href="javascript:;">删除节点</a>'
+            ].join('')
+        }
+
+        function send_num_manage(op, node_type, free_space, num) {
+            $.ajax({
+                url: '/node_num_manage/',
+                type: op,
+                headers: {
+                    Authorization: token,
+                },
+                data: {
+                    node_type: node_type,
+                    free_space: free_space,
+                    num: num,
+                },
+                success: function (data) {
+                    $('#numInputModal').modal('hide');
+                    if (data.state === 0) {
+                        $('#infoModal .info-img').attr('src', '../static/images/succeed.svg');
+                        $('#infoModal .info-msg').html(data.msg);
+                        $('#infoModal').modal('show');
+                    } else if (data.state === 1) {
+                        $('#infoModal .info-img').attr('src', '../static/images/succeed.svg');
+                        $('#infoModal .info-msg').html(data.msg);
+                        $('#infoModal').modal('show');
+                    } else {
+                        alert('错误');
+                    }
+                }
+            })
+        }
+
+        $('.num-manage #submit').click(function () {
+            num = $('.num-manage #num').val();
+            send_num_manage(op, node_type, free_space, num)
+        });
+        window.operateEvents_1 = {
+            "click .add_node": function (e, value, row, index) {
+                $('.num-manage #myModalLabel').html("添加节点");
+                $('.num-manage').show();
+                $('.run-manage').hide();
+
+                $('#numInputModal .num-manage #op_all').html('');
+
+                $('#numInputModal').modal('show');
+                op = 'POST';
+                node_type = row.node_type;
+                free_space = row.free_space;
+                console.log('添加节点', e, value, row, index)
+            },
+            "click .del_node": function (e, value, row, index) {
+                $('.num-manage #myModalLabel').html("删除节点");
+
+                $('.num-manage').show();
+                $('.run-manage').hide();
+                $('#numInputModal .num-manage #op_all').html('删除全部');
+                $('#numInputModal .num-manage #op_all').click(function () {
+                    $('#numInputModal .num-manage #num').val(row.num);
+                });
+                $('#numInputModal').modal('show');
+                op = 'DELETE';
+                node_type = row.node_type;
+                free_space = row.free_space;
+                console.log('删除节点', e, value, row, index)
+            }
+
+        };
+
+
+        $(function () {
+
+            //1.初始化Table1
+            var oTable = new TableInit();
+            oTable.Init();
+
+            //2.初始化Button的点击事件
+//            var oButtonInit = new ButtonInit();
+//            oButtonInit.Init();
+
+            // 初始化Table2
+            var oTable2 = new TableInit_2();
+            oTable2.Init();
+
+
+        });
+
+
+    </script>
+
+    <!--节点运行管理脚本-->
+    <script>
+        curRow = null;
+        run_op = null;
+        //节点运行管理表初始化
+        var TableInit_2 = function () {
+            var oTableInit = {};
+            //初始化Table
+            oTableInit.Init = function () {
+                $('#node_table_2').bootstrapTable({
+                    url: '/node_run_manage',         //请求后台的URL（*）
+                    method: 'get',                      //请求方式（*）
+                    toolbar: '#toolbar_2',                //工具按钮用哪个容器
+                    striped: true,                      //是否显示行间隔色
+                    cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                    pagination: true,                   //是否显示分页（*）
+                    sortable: false,                     //是否启用排序
+                    sortOrder: "asc",                   //排序方式
+                    queryParams: oTableInit.queryParams,//传递参数（*）
+                    sidePagination: "client",           //分页方式：client客户端分页，server服务端分页（*）
+                    pageNumber: 1,                       //初始化加载第一页，默认第一页
+                    pageSize: 10,                       //每页的记录行数（*）
+                    pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                    search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                    strictSearch: false,                //启用严格搜索
+                    showColumns: true,                  //是否显示所有的列
+                    showRefresh: true,                  //是否显示刷新按钮
+                    minimumCountColumns: 2,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+                    height: 500,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                    uniqueId: "node_type",                     //每一行的唯一标识，一般为主键列
+                    showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                    cardView: false,                    //是否显示详细视图
+                    detailView: false,                   //是否显示父子表
+                    columns: [{
+                        field: 'node_type',
+                        title: '节点类型',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'node_num',
+                        title: '总节点数',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'run_num',
+                        title: '在运行数量',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'operate',
+                        title: '操作',
+                        align: "center",
+                        valign: "middle",
+                        events: operateEvents_2,
+                        formatter: OpFunctionAlty,
+                    }]
+                });
+            };
+
+            //得到查询的参数
+            oTableInit.queryParams = function (params) {
+                var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                    limit: params.limit,   //页面大小
+                    offset: params.offset,  //页码
+                };
+                return temp;
+            };
+            return oTableInit;
+        };
+
+
+        function OpFunctionAlty() {
+            return ['<a class=open_node href="javascript:;">开启</a>&nbsp&nbsp',
+                '<a class=close_node href="javascript:;">关闭</a>',
+            ].join('')
+
+        }
+
+
+        function send_run_manage(op, node_type, num) {
+            $.ajax({
+                url: '/node_run_manage/',
+                type: 'put',
+                headers: {
+                    Authorization: token,
+                },
+                data: {
+                    action: op,
+                    node_type: node_type,
+                    num: num,
+                },
+                success: function (data) {
+                    $('#numInputModal').modal('hide');
+                    if (data.state === 0) {
+                        $('#infoModal .info-img').attr('src', '../static/images/succeed.svg');
+                        $('#infoModal .info-msg').html(data.msg);
+                        $('#infoModal').modal('show');
+                    } else if (data.state === 1) {
+                        $('#infoModal .info-img').attr('src', '../static/images/succeed.svg');
+                        $('#infoModal .info-msg').html(data.msg);
+                        $('#infoModal').modal('show');
+                    } else {
+                        alert('错误');
+                    }
+                }
+            })
+
+        }
+
+
+        $('.run-manage #submit').click(function () {
+            num = $('.run-manage #num').val();
+            send_run_manage(run_op, curRow.node_type, num)
+        });
+
+
+        window.operateEvents_2 = {
+            "click .open_node": function (e, value, row, index) {
+                $('.run-manage #myModalLabel').html("开启节点");
+                $('.num-manage').hide();
+                $('.run-manage').show();
+
+                $('.run-manage #num').val(1);
+                curRow = row;
+                run_op = 'open';
+                $('#numInputModal').modal('show');
+                $('#numInputModal .run-manage #op_all').html('开启全部');
+                $('#numInputModal .run-manage #op_all').click(function () {
+                    $('#numInputModal .run-manage #num').val(row.node_num - row.run_num);
+                });
+
+
+                console.log('开启节点', e, value, row, index)
+            },
+            "click .close_node": function (e, value, row, index) {
+                $('.run-manage #myModalLabel').html("关闭节点");
+                $('.num-manage').hide();
+                $('.run-manage').show();
+                $('.run-manage #num').val(1);
+                curRow = row;
+                run_op = 'close';
+                $('#numInputModal').modal('show');
+
+                $('#numInputModal .run-manage #op_all').html('关闭全部');
+
+                $('#numInputModal .run-manage #op_all').click(function () {
+                    $('#numInputModal .run-manage #num').val(row.run_num);
+                });
+
+                console.log('关闭节点', e, value, row, index)
+            }
+
+        };
+
+        $(function () {
+            var oTable2 = new TableInit_2();
+            oTable2.Init();
+
+
+        });
+
+
+        $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+                href_ = e.target.attributes.href.value;
+                console.log(href_)
+                if(href_=='#node_3'){
+                    $.ajax(
+                        {
+                            url: '/set_cpu_or_mem/',
+                            type: 'get',
+                            success(res){
+                                console.log(res)
+                                if(res.status==200){
+                                  $($('input[name="employ"]')[0]).val(res.cpu)
+                                   $($('input[name="employ"]')[1]) .val(res.mem)
+                                }
+                            }
+                        }
+                    )
+                }
+            });
+
+
+        $(function () {
+            {#    保存#}
+            $('.confirmSaveCpu').click(function () {
+                console.log(111111);
+                  let num;
+                 console.log($($('input[name="employ"]')[0]).val());
+                 console.log(parseInt($($('input[name="employ"]')[0]).val())<=100);
+                 int1 = parseInt($($('input[name="employ"]')[0]).val());
+                 if(int1>0 && int1<=100){
+                     console.log('11111111111111')
+                     console.log(typeof $($('input[name="employ"]')[0]).val())
+                     console.log(typeof parseInt($($('input[name="employ"]')[0]).val()))
+
+                     num = $($('input[name="employ"]')[0]).val();
+                     $.ajax({
+                         url: '/set_cpu_or_mem/',
+                         type: 'POST',
+                         {#processData: false,   // jQuery不要去处理发送的数据#}
+                         data: {
+                             action: 'cpu',
+                             num: num,
+                         }, success(res) {
+                        if(res.status==200){
+                            console.log(res)
+                            }else {
+
+                            }
+                         }
+                     })
+                 }else{
+                     alert('取值在0-100')
+                 }
+
+            });
+            $('.confirmSaveMem').click(function () {
+                console.log(111111);
+                  let num;
+                 console.log($($('input[name="employ"]')[1]).val());
+                 if(0<parseInt($($('input[name="employ"]')[1]).val())<=100){
+                     num = $($('input[name="employ"]')[1]).val();
+                     $.ajax({
+                         url: '/set_cpu_or_mem/',
+                         type: 'post',
+                         data: {
+                             action: 'mem',
+                             num: num,
+                         }, success(res) {
+                                console.log(res)
+                         }
+                     })
+                 }else{
+                         alert('取值在0-100')
+                 }
+
+            })
+        })
+    </script>
+
+
+{% endblock %}

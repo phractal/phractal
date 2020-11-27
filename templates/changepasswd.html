@@ -1,0 +1,69 @@
+{% extends './particular.html' %}
+
+
+{% block content %}
+    <!-- 修改密码 -->
+    <div class="alter-password">
+                <div class="tem-box">
+                    <div class="store">修改密码</div>
+                </div>
+                <div class="input">
+                    <form action="">
+                        <div class="phone">
+                            <select name="" id="">
+                                <option value="">+86</option>
+                                <option value="">+11</option>
+                            </select>
+                            <input type="text" placeholder="11 位⼿机号" class="cell"><br>
+                        </div>
+                        <div class="verify-code">
+                            <input type="text" placeholder="输⼊验证码" class="verify"><br>
+                            <div class="code">获取验证码</div>
+                        </div>
+                        <input type="text" placeholder="6 - 16 位密码，区分⼤⼩写" class="password"><br>
+                        <input type="text" placeholder="确认密码" class="confirm-password"><br>
+                        <input type="submit" value="提交" class="commit">
+                    </form>
+
+                </div>
+
+        </div>
+<style>
+{###}
+
+input{
+    background: #1f2731;
+    border: 0;
+    margin-bottom: 24px;
+}
+.alter-password{
+    background: #000;
+}
+.alter-password .input .verify-code .code{
+    color: #53afff;
+}
+.alter-password .store{
+    color: #0080ff;
+    border-bottom:solid 2px #0080ff;
+}
+
+</style>
+    <script>
+        // 修改密码
+        $(function () {
+            $(".alter-password").siblings().css("display", "none");
+            $(".alter-password").css("display", "block");
+            $('#alter-password img:eq(0)').css("display", "none");
+            $('#alter-password img:eq(1)').css("display", "block");
+            $('#alter-password div').css("color", "#427CFF");
+            $('#alter-password').siblings().children("img").hide();
+            $('#alter-password').siblings().children(".now").show();
+            $('#alter-password').siblings().children().css("color", "#fafafa");
+        });
+
+
+    </script>
+
+
+
+{% endblock %}

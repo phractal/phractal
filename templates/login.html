@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js"></script>
+    <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <title>登录</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        text-decoration: none;
+    }
+
+    a {
+
+        color: #53afff;
+    }
+
+    html {
+        background-color: #00084A;
+    }
+
+    .container {
+        width: 500px;
+        margin: 180px auto;
+        text-align: center;
+        position: relative;
+    }
+
+    .logo_icon img {
+        width: 150px;
+        height: 40px;
+        margin-bottom: 10px;
+    {#font-size: 50px;#}{#color: #40BDE4;#}
+    }
+
+    .container .text {
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 14px;
+    }
+
+    .container .logon {
+        width: 136px;
+        color: #53afff;
+        margin: 0 auto;
+        padding: 42px 0 12px 0;
+        font-weight: bold;
+        border-bottom: 2px solid #53afff;
+    }
+
+    .logon_input {
+        position: relative;
+        margin-top: 24px;
+    }
+
+    .logon_input img {
+        width: 16px;
+        height: 16px;
+        position: absolute;
+        top: calc(50% - 8px);
+        left: 75px;
+    }
+
+    .container input {
+        width: 368px;
+        height: 38px;
+        border-radius: 5px;
+        border: 0;
+        background-color: #000000;
+        font-size: 16px;
+        line-height: 40px;
+        outline: none;
+        text-indent: 36px !important;
+        color: #ffffff;
+
+    }
+
+    .container input::-webkit-input-placeholder {
+        color: #E5E5E5;
+        font-size: 16px;
+    }
+
+    .container p {
+        font-size: 14px;
+        text-align: right;
+        margin: 24px 65px 24px 65px;
+    }
+
+    .container .account,
+    .container .password {
+        text-indent: 12px;
+    }
+
+    .container .log-in {
+        background-color: #53afff;
+        font-weight: bold;
+        color: #ffffff;
+    }
+
+    .logon_imgs {
+        position: absolute;
+        bottom: 0;
+        color: #afafaf;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        left: 65px;
+    }
+
+    .logon_imgs .weixin {
+        width: 24px;
+        height: 24px;
+        margin-left: 16px;
+    }
+
+    .cloud {
+        font-size: 14px;
+        position: fixed;
+        bottom: 20px;
+        left: calc(50% - 170px);
+        color: #545454;
+    }
+</style>
+
+<body>
+<div class="container">
+    <div class="logo_icon"><img src="/static/images/logo—icon.png" alt=""></div>
+    <div class="text">是东半球最具影响力的数据抓取任务发布平台</div>
+    <div class="logon">登录</div>
+    <div class="logon_input">
+        <img src="/static/images/account.png">
+        <input type="text" placeholder="账号" class="account"></div>
+    <div class="logon_input">
+        <img src="/static/images/password.png">
+        <input type="password" placeholder="密码" class="password">
+    </div>
+    <p><a href="">忘记密码</a></p>
+    <input type="submit" id="submit" value="登录" class="log-in">
+    <p><a href="/register">注册账户</a></p>
+    {#    <input type="submit" id="wxsubmit" value="微信登录" class="log-in">#}
+    <div class="logon_imgs" id="wxqrcode">
+        <span>其他登录方式</span>
+        <img src="/static/images/weixin.png" class="weixin" id="wxsubmit">
+
+    </div>
+    <div class="cloud">©2019黑云科技 隐私政策 服务条款 京ICP证080268号</div>
+    {#    <div id="wxsubmit" class="log-in">微信登录</div>#}
+</div>
+</body>
+
+<script type="text/javascript">
+    $(function () {
+        $("#submit").click(function () {
+            var username = $(".account").val();
+            var password = $(".password").val();
+            {#let username = "username"#}
+            {#let password = "password"#}
+            $.ajax({
+                type: "POST",
+                url: "/api-token-auth/",
+                data: JSON.stringify({"username": username, "password": password}),
+                contentType: "application/json",
+                success: function (token) {
+                    console.log(token);
+
+                    localStorage.token = token.access;
+
+                    console.log('token:',token.access);
+                    $.cookie('token', token.access);
+                    console.log( $.cookie("token"),'111111111111111')
+
+                    window.location.href = "/search_history?token="+token.access
+                },
+                error: function () {
+                    alert("登录名或者密码错误，请重新输入");
+                    return false
+                }
+            })
+        })
+
+    });
+
+    $(function () {
+        $("#wxsubmit").click(function () {
+            {#window.WxLogin({#}
+            {#    self_redirect: false,#}
+            {#    id: "wxsubmit",#}
+            {#    appid: "wxbb19e286afae10db",#}
+            {#    scope: "snsapi_login",#}
+            {#    redirect_uri: 'http://127.0.0.1:8000/authorization',#}
+            {#    wechet_redirect: 1#}
+            {# }) #}
+            console.log('==============')
+
+
+            var obj = new WxLogin({
+                id: "wxqrcode",//div的id
+                appid: "wxbb19e286afae10db",
+                scope: "snsapi_login",//写死
+                redirect_uri: "http://127.0.0.1:8000/authorization",
+                state: "",
+                style: "black",//二维码黑白风格
+                href: ""
+             });
+
+        })
+
+    });
+
+</script>
+
+</html>

@@ -1,0 +1,125 @@
+{% extends './particular.html' %}
+
+
+{% block content %}
+
+    <!-- 我的接单 -->
+    <div class="order" >
+        <div class="order-cont tab_cont">
+            <ul class="tab">
+                <li class="tab-item active">全部</li>
+                <li class="tab-item">进行中</li>
+                <li class="tab-item">已完成</li>
+            </ul>
+            <input type="text" placeholder="请输入">
+        </div>
+        <div class="products">
+            <div class="main selected" id="my_task">
+
+
+            </div>
+            <div class="main">
+            </div>
+            <div class="main">
+            </div>
+        </div>
+    </div>
+    <script>
+        $(function () {
+
+            $(".order").siblings().css("display", "none");
+            $(".order").css("display", "block");
+            $('#order img:eq(0)').css("display", "none");
+            $('#order img:eq(1)').css("display", "block");
+            $('#order div').css("color", "#427CFF");
+            $('#order').siblings().children("img").hide();
+            $('#order').siblings().children(".now").show();
+            $('#order').siblings().children().css("color", "#000");
+            var token = "Bearer " + localStorage.token;
+            var user_id = localStorage.user_id
+            $.ajax({
+                url: "/task/?received=" + user_id,
+                contentType: "application/json",
+                headers: {
+                    Authorization: token,
+                },
+                async: false,
+                cache: false,
+                success: function (tasks) {
+                    console.log(tasks);
+                    var ele0 = "";
+                    $("#my_task").empty();
+                    var order_selector = $(".order .products .main");
+                    order_selector.eq(1).empty();
+                    order_selector.eq(2).empty();
+                    $.each(tasks, function (i, task) {
+                        ele0 = " <div class=\"main_cont\">\n" +
+                            "                            <div class=\"cont_introduce\">\n" +
+                            "                                <p>提交数据源url：" + task.url + "</p>\n" +
+                            "                                <p><span>数据类型：" + task.category + "</span><span>佣金：" + task.price + "元</span></p>\n" +
+                            "                                <p><span>发布时间：" + task.publish_time + "</span><span>剩余时间：" + task.left_time + "</span></p>\n" +
+                            "                            </div>\n" +
+                            "                            <div class=\"cont_piay\">\n" +
+                            "                                <span class=\"my_detail\" data-id=\"" + task.id + "\">明细</span>\n" +
+                            "                            </div>\n" +
+                            "                        </div>";
+                        $("#my_task").append(ele0);
+                        if (task.status !== "已完成") {
+                            order_selector.eq(1).append(ele0)
+                        } else {
+                            order_selector.eq(2).append(ele0)
+                        }
+                    });
+                    //我的接单明细
+                    $(".my_detail").click(function () {
+                        $(".mask").show();
+                        $(".coverMy").show();
+                        let task_id = $(this).attr("data-id");
+                        let ele = "<tr>\n" +
+                            "                <th>节点名</th>\n" +
+                            "                <th>节点IP</th>\n" +
+                            "                <th>节点类型</th>\n" +
+                            "                <th>节点创建时间</th>\n" +
+                            "                <th>完成任务数</th>\n" +
+                            "                <th>失败任务数</th>\n" +
+                            "                <th>时单价</th>\n" +
+                            "                <th>总收益</th>\n" +
+                            "            </tr>\n";
+                        $.ajax({
+                            url: "/task/" + task_id,
+                            contentType: "application/json",
+                            headers: {
+                                Authorization: token,
+                            },
+                            async: false,
+                            cache: false,
+                            success: function (result) {
+                                console.log(result);
+                                let task_node_list = result.tasknode_set;
+                                $("#my_task_detail").empty();
+                                $.each(task_node_list, function (i, task) {
+                                    ele +=
+                                        "            <tr>\n" +
+                                        "                <td>" + task.node_detail.name + "</td>\n" +
+                                        "                <td>" + task.node_detail.ip + "</td>\n" +
+                                        "                <td>" + task.node_detail.category + "</td>\n" +
+                                        "                <td>" + formateDate(task.node_detail.create_time) + "</td>\n" +
+                                        "                <td>" + task.node_detail.succeed_tasks + "</td>\n" +
+                                        "                <td>" + task.node_detail.failed_tasks + "</td>\n" +
+                                        "                <td>" + task.node_detail.unit_price + "</td>\n" +
+                                        "                <td>" + task.node_detail.total_revenue + "</td>\n" +
+                                        "            </tr>"
+                                });
+                                $("#my_task_detail").append(ele)
+                            }
+                        });
+                    });
+                }
+            })
+
+
+        });
+
+
+    </script>
+{% endblock %}

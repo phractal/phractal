@@ -1,0 +1,357 @@
+{% extends './particular.html' %}
+
+
+{% block content %}
+            <link rel="stylesheet" href="../static/lib/bootstrap-table/bootstrap-table.min.css">
+            <script src="../static/lib/bootstrap-table/bootstrap-table.min.js"></script>
+            <script src="../static/lib/bootstrap-table/bootstrap-table-zh-CN.min.js"></script>
+
+
+             <style>
+                /* 模态框居中样式 */
+                .bootbox-container {
+                    position: fixed;
+                    top: 0;
+                    right: 0;
+                    bottom: 0;
+                    left: 0;
+                    z-index: 1049;
+                    overflow-y: auto;
+                }
+
+                .bootbox-container:empty {
+                    position: static;
+                }
+
+                .modal {
+                    display: table;
+                    width: 440px;
+                    height: 60%;
+                    margin: 0 auto;
+                }
+
+                .modal-dialog {
+                    display: table-cell;
+                    vertical-align: middle;
+                }
+                /* //模态框居中样式 */
+
+
+
+
+                #numInputModal .modal-footer{
+                    border-top: none;
+                    margin-top: 15px;
+                }
+
+                #numInputModal .modal-footer .btn{
+                    width: 110px;
+                    margin-right: 58px;
+                }
+
+                #numInputModal .modal-header{
+                    border-bottom: none;
+                }
+
+            </style>
+
+            <!--统计查询-->
+
+            <ul id="myTab" class="nav nav-tabs">
+                <li class="active"><a href="#node_1" data-toggle="tab">节点下载</a></li>
+                <li><a href="#node_2" data-toggle="tab">已下载节点</a></li>
+            </ul>
+
+            <div id="myTabContent" class="tab-content">
+                <!--全局节点统计-->
+                <div class="tab-pane fade  in active" id="node_1">
+                    <table class="table" id="node_table_1"></table>
+                </div>
+
+                <!--本地节点统计-->
+                <div class="tab-pane fade" id="node_2">
+                    <table class="table" id="node_table_2"></table>
+                </div>
+
+            </div>
+
+
+    <script>
+         // 我的节点
+        $(function () {
+            $(".download").siblings().css("display", "none");
+            $(".download").css("display", "block");
+            $('#download img:eq(0)').css("display", "none");
+            $('#download img:eq(1)').css("display", "block");
+            $('#download div').css("color", "#427CFF");
+            $('#download').siblings().children("img").hide();
+            $('#download').siblings().children(".now").show();
+            $('#download').siblings().children().css("color", "#fafafa");
+
+        });
+    </script>
+    <script>
+
+        op = '';
+        node_type = '';
+        free_space = '';
+        var token = "Bearer " + localStorage.token;
+        //节点数量管理表初始化
+        var TableInit = function () {
+            var oTableInit = {};
+            //初始化Table
+            oTableInit.Init = function () {
+                $('#node_table_1').bootstrapTable({
+                    url: '/all_download_node',         //请求后台的URL（*）
+                    method: 'get',                      //请求方式（*）
+                    toolbar: '#toolbar_1',                //工具按钮用哪个容器
+                    striped: true,                      //是否显示行间隔色
+                    cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                    pagination: true,                   //是否显示分页（*）
+                    sortable: false,                     //是否启用排序
+                    sortOrder: "asc",                   //排序方式
+                    queryParams: oTableInit.queryParams,//传递参数（*）
+                    sidePagination: "client",           //分页方式：client客户端分页，server服务端分页（*）
+                    pageNumber:1,                       //初始化加载第一页，默认第一页
+                    pageSize: 10,                       //每页的记录行数（*）
+                    pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                    {#search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大#}
+                    {#strictSearch: false,                //启用严格搜索#}
+                    {#showColumns: true,                  //是否显示所有的列#}
+                    {#showRefresh: true,                  //是否显示刷新按钮#}
+                    minimumCountColumns: 2,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+                    height: 500,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                    uniqueId: "node_type",                     //每一行的唯一标识，一般为主键列
+                    showToggle:false,                    //是否显示详细视图和列表视图的切换按钮
+                    cardView: false,                    //是否显示详细视图
+                    detailView: false,                   //是否显示父子表
+                    columns: [{
+                        field: 'category',
+                        title: '节点类型',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'hardware',
+                        title: '硬件配置要求',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'size',
+                        title: '软件大小',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'unit_price',
+                        title: '运行代价',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'require_percent',
+                        title: '全网需求比',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'md5',
+                        title: '节点软件md5值',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'user',
+                        title: '节点发布者',
+                        align: "center",
+                        valign: "middle"
+                    },{
+                        field: 'create_time',
+                        title: '节点发布时间',
+                        align: "center",
+                        valign: "middle"
+                    },{
+                        field: 'security_authentication',
+                        title: '安全认证',
+                        align: "center",
+                        valign: "middle"
+                    },{
+                        field: 'system',
+                        title: '适用系统',
+                        align: "center",
+                        valign: "middle"
+                    },   {
+                        field: 'operate',
+                        title: '操作',
+                        align: "center",
+                        valign: "middle",
+                        events: operateEvents_1,
+                        formatter: AddFunctionAlty,
+                    }]
+                });
+            };
+
+            //得到查询的参数
+            oTableInit.queryParams = function (params) {
+                    var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                        limit: params.limit,   //页面大小
+                        offset: params.offset,  //页码
+                    };
+                    return temp;
+            };
+            return oTableInit;
+        };
+         function AddFunctionAlty(value,row,index){
+            //return ['<a id=“add_node” href="javascript:;">添加节点</a>',
+            //        '<a id=“del_node” href="javascript:;">删除节点</a>'
+            //]
+            return ['<a class=add_node href="javascript:;">下载</a>&nbsp&nbsp'].join('')
+        }
+        window.operateEvents_1 = {
+            "click .add_node":function (e,value,row,index) {
+                $('#myModalLabel').text("添加节点");
+                $('#numInputModal').modal('show');
+                op = 'POST';
+                node_type = row.node_type;
+                free_space = row.free_space;
+                console.log('添加节点',e,value,row,index)
+            }
+        };
+        //节点运行管理表初始化
+        var TableInit_2 = function () {
+            var oTableInit = {};
+            //初始化Table
+            oTableInit.Init = function () {
+                $('#node_table_2').bootstrapTable({
+                    url: '/already_download_node',         //请求后台的URL（*）
+                    method: 'get',                      //请求方式（*）
+                    toolbar: '#toolbar_2',                //工具按钮用哪个容器
+                    striped: true,                      //是否显示行间隔色
+                    cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                    pagination: true,                   //是否显示分页（*）
+                    sortable: false,                     //是否启用排序
+                    sortOrder: "asc",                   //排序方式
+                    queryParams: oTableInit.queryParams,//传递参数（*）
+                    sidePagination: "client",           //分页方式：client客户端分页，server服务端分页（*）
+                    pageNumber:1,                       //初始化加载第一页，默认第一页
+                    pageSize: 10,                       //每页的记录行数（*）
+                    pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                    {#search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大#}
+                    {#strictSearch: false,                //启用严格搜索#}
+                    {#showColumns: true,                  //是否显示所有的列#}
+                    {#showRefresh: true,                  //是否显示刷新按钮#}
+                    minimumCountColumns: 2,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+                    height: 500,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                    uniqueId: "node_type",                     //每一行的唯一标识，一般为主键列
+                    showToggle:false,                    //是否显示详细视图和列表视图的切换按钮
+                    cardView: false,                    //是否显示详细视图
+                    detailView: false,                   //是否显示父子表
+                    columns:[{
+                        field: 'category',
+                        title: '节点类型',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'hardware',
+                        title: '硬件配置要求',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'size',
+                        title: '软件大小',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'unit_price',
+                        title: '运行代价',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'require_percent',
+                        title: '全网需求比',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'md5',
+                        title: '节点软件md5值',
+                        align: "center",
+                        valign: "middle"
+                    }, {
+                        field: 'user',
+                        title: '节点发布者',
+                        align: "center",
+                        valign: "middle"
+                    },{
+                        field: 'create_time',
+                        title: '节点发布时间',
+                        align: "center",
+                        valign: "middle"
+                    },{
+                        field: 'security_authentication',
+                        title: '安全认证',
+                        align: "center",
+                        valign: "middle"
+                    },{
+                        field: 'system',
+                        title: '适用系统',
+                        align: "center",
+                        valign: "middle"
+                    },  {
+                        field: 'operate',
+                        title: '操作',
+                        align: "center",
+                        valign: "middle",
+                        events: operateEvents_2,
+                        formatter: OpFunctionAlty,
+                    }]
+                });
+            };
+
+            //得到查询的参数
+            oTableInit.queryParams = function (params) {
+                    var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                        limit: params.limit,   //页面大小
+                        offset: params.offset,  //页码
+                        uid: localStorage.user_id,
+                    };
+                    return temp;
+            };
+            return oTableInit;
+        };
+
+        function OpFunctionAlty(){
+            return ['<a class=del_node href="javascript:;">删除</a>&nbsp&nbsp'].join('')
+
+        }
+
+        window.operateEvents_2 = {
+            "click .del_node":function (e,value,row,index) {
+                $('#myModalLabel').text("删除节点");
+                $('#numInputModal').modal('show');
+                op = 'DELETE';
+                node_type = row.node_type;
+                free_space = row.free_space;
+                console.log('删除节点',e,value,row,index)
+            }
+        };
+
+        $(function () {
+
+            //1.初始化Table1
+            var oTable = new TableInit();
+            oTable.Init();
+
+            //2.初始化Button的点击事件
+//            var oButtonInit = new ButtonInit();
+//            oButtonInit.Init();
+
+            // 初始化Table2
+            var oTable2 = new TableInit_2();
+            oTable2.Init();
+
+
+
+
+        });
+
+
+
+    </script>
+{% endblock %}
