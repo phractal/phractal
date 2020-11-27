@@ -1,0 +1,7 @@
+Django==2.2.1
+qrcode==6.1
+drf_yasg==1.15.0
+djangorestframework_simplejwt==4.3.0
+requests==2.18.4
+beautifulsoup4==4.8.0
+djangorestframework==3.10.2
