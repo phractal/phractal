@@ -1,0 +1,13 @@
+body{
+    background-color: #f2f2f2;
+}
+.w1200{
+     width: 1200px;
+        margin: 0 auto;
+}
+.nav,.banner,.main_cont{
+   width:  100%;
+}
+.cb{
+    clear: both;
+}
