@@ -1,7 +1,5 @@
 # coding:utf-8
 # _author_:Junjie
-# date:2019/2/26
-
 
 class ListSet:
     def __init__(self, content):
